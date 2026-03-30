@@ -1,0 +1,1686 @@
+<svg version="1.1" baseProfile="full" width="14723.0" height="661.0" viewBox="0 0 14723 661" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+<desc >#.interface: fill=lightblue
+#.enumeration: fill=lightgreen
+#.type: fill=lightgray
+
+[AppController|-appService: AppService|+getHello(): string]
+[AppModule||]
+[AppService||+getHello(): string]
+[AspirationsModule||]
+[AspirationsService||]
+[AuthController|-authService: AuthService|+register(): Promise&lt;Record&lt;string, string&gt;&gt;;+verifyEmail(): Promise&lt;{ message: string; }&gt;;+login(): Promise&lt;Record&lt;string, string&gt;&gt;;+logout(): { message: string; }]
+[AuthModule||]
+[AuthService|-usersService: UsersService;-transporter: Transporter;-jwtService: JwtService|+register(): Promise&lt;{ message: string; }&gt;;+verifyEmail(): Promise&lt;{ message: string; }&gt;;+sendEmailVerificationLink(): Promise&lt;any&gt;;+createTokenLink(): Promise&lt;string&gt;;+validateUser(): boolean;+login(): Promise&lt;Record&lt;string, string&gt;&gt;]
+[CategoriesController|-categoriesService: CategoriesService|+createCategory(): Promise&lt;Record&lt;string, any&gt;&gt;;+deleteCategory(): Promise&lt;{ message: string; }&gt;;+updateCategory(): Promise&lt;{ messsage: string; category: UpdateResult; }&gt;;+getAllCategories(): Promise&lt;Category\[\]&gt;]
+[CategoriesModule||]
+[CategoriesService|-categoryRepository: Repository&lt;Category&gt;;-priorityService: PriorityService|+createCategory(): Promise&lt;{ message: string; category: Category; }&gt;;+deleteCategory(): Promise&lt;{ message: string; }&gt;;+updateCategory(): Promise&lt;{ messsage: string; category: UpdateResult; }&gt;;+findCategoryById(): Promise&lt;Category&gt;;+getAllCategories(): Promise&lt;Category\[\]&gt;]
+[LocationsController||]
+[LocationsModule||]
+[LocationsService|-locationRepository: Repository&lt;Location&gt;|+createLocation(): Promise&lt;{ message: string; location: { building: { id: number; }; detail: string; room: string; floor: number; } &amp; Location; }&gt;]
+[PriorityController|-priorityService: PriorityService|+createPriority(): Promise&lt;{ message: string; priority: Priority; }&gt;]
+[PriorityModule||]
+[PriorityService|-priorityRepository: Repository&lt;Priority&gt;|+createPriority(): Promise&lt;{ message: string; priority: Priority; }&gt;;+findPriorityById(): Promise&lt;Priority&gt;]
+[R2Module||]
+[ReportsController|-reportsService: ReportsService;-authService: AuthService|+crateReport(): Promise&lt;{ message: string; report: Report; }&gt;;+updateReport(): Promise&lt;{ message: string; report: Report; }&gt;;+findReport(): Promise&lt;Report\[\]&gt;;+findStatistic(): Promise&lt;{ total: number; count: { pending: number; progress: number; done: number; rejected: number; }; }&gt;;+deleteReport(): Promise&lt;{ message: string; report: Report; }&gt;]
+[ReportsModule||]
+[ReportsService|-reportRepository: Repository&lt;Report&gt;;-locationService: LocationsService;-categoriesService: CategoriesService;-buildingService: BuildingsService;-usersService: UsersService;-r2: S3Client;-priorityService: PriorityService|+createReport(): Promise&lt;{ message: string; report: Report; }&gt;;+updateReport(): Promise&lt;{ message: string; report: Report; }&gt;;+findReport(): Promise&lt;Report&gt;;+findMany(): Promise&lt;Report\[\]&gt;;+findStatistic(): Promise&lt;{ total: number; count: { pending: number; progress: number; done: number; rejected: number; }; }&gt;;+deleteReport(): Promise&lt;{ message: string; report: Report; }&gt;]
+[UsersModule||]
+[UsersService|-userRepository: Repository&lt;User&gt;|+createUnverifiedUser(): Promise&lt;User&gt;;+isEmailExist(): Promise&lt;boolean&gt;;+isEmailExistAndVerified(): Promise&lt;Boolean&gt;;+findUserByEmail(): Promise&lt;User&gt;;+completeUserVerification(): Promise&lt;UpdateResult&gt;;+findOneTechnicianById(): Promise&lt;User&gt;]
+[Aspiration|+id: number;+user: User;+title: string;+category: Category;+img_url: string;+created_at: Date|]
+[LoginDto|+email: string;+password: string|]
+[RegisterDto|+username: string;+email: string;+password: string;+passwordConfirm: string|]
+[RegisterResponseDto|+message: string|]
+[AuthGuard|-authService: AuthService|+canActivate(): boolean \| Promise&lt;boolean&gt;]
+[CanActivate]&lt;:--[AuthGuard]
+[RolesGuard|-reflector: Reflector|+canActivate(): boolean]
+[CanActivate]&lt;:--[RolesGuard]
+[CreateCategoryDto|+name: string;+priority: number|]
+[UpdateDto|+id: number;+name: string;+priorityId: number|]
+[Category|+id: number;+name: string;+isSystem: boolean;+priority: Priority;+report: Report\[\];+aspiration: Aspiration;+createdAt: Date|]
+[BuildingsController|-buildingService: BuildingsService|+createBuilding(): Promise&lt;{ message: string; building: Building; }&gt;;+getAllBuildings(): Promise&lt;Building\[\]&gt;]
+[BuildingsService|-buildingRepository: Repository&lt;Building&gt;;-facultiesService: FacultiesService|+createBuilding(): Promise&lt;{ message: string; building: Building; }&gt;;+findMany(): Promise&lt;Building\[\]&gt;;+findOneById(): Promise&lt;Building&gt;]
+[BuildingsFilterDto|+name: string;+floors: number;+isGeneral: string;+faculty: number|]
+[CreateBuildingDto|+name: string;+floors: number;+facultyId: number|]
+[createFacultyDto|+name: string;+code: string|]
+[CreateLocationDto|+buildingId: number;+floor: number;+detail: string;+room: string|]
+[Building|+id: number;+name: string;+floors: number;+faculty: Faculty;+location: Location\[\];+isSystem: boolean;+isGeneral: boolean;+created_at: Date|]
+[Faculty|+id: number;+name: string;+code: string;+building: Building\[\];+isSystem: boolean;+createdAt: Date|]
+[Location|+id: number;+building: Building;+floor: number;+room: string;+detail: string;+report: Report;+isSystem: boolean;+createdAt: Date|]
+[FacultiesController|-facultiesService: FacultiesService|+createFaculty(): Promise&lt;{ message: string; }&gt;;+getAllFaculties(): Promise&lt;Faculty\[\]&gt;]
+[FacultiesService|-facultyRepository: Repository&lt;Faculty&gt;|+createFaculty(): Promise&lt;{ message: string; }&gt;;+findFacultyById(): Promise&lt;Faculty&gt;;+getAllFaculties(): Promise&lt;Faculty\[\]&gt;]
+[CreatePriorityDto|+name: string;+slaHours: number;+weight: number|]
+[Priority|+id: number;+name: string;+slaHours: number;+weight: number;+category: Category\[\];+report: Report\[\]|]
+[CreateReportDto|+categoryId: number;+buildingId: number;+room: string;+floor: string;+detail: string;+description: string|]
+[FindReportDto|+id: string;+building: string;+category: string;+faculty: string;+from: string;+page: number;+limit: number;+status: ReportStatusWithAll|]
+[Location|+buildingId: number;+room: string;+detail: string;+floor: string|]
+[UpdateReportDto|+reportId: number;+categoryId: number;+location: Location;+status: string;+description: string;+adminNote: string;+technicianNote: string;+priority: number;+assignedTechnicianId: number|]
+[Report|+id: number;+user: User;+assignedTechnician: User;+category: Category;+slaDate: Date;+location: Location;+description: string;+adminNote: string;+status: ReportStatus;+slaStatus: SlaStatus;+priority: Priority;+technicianNote: string;+imgUrl: string;+createdAt: Date|]
+[ParseJsonPipe||+transform(): any]
+[PipeTransform&lt;T,R&gt;]&lt;:--[ParseJsonPipe]
+[MatchConstraint||+validate(): boolean]
+[ValidatorConstraintInterface]&lt;:--[MatchConstraint]
+[CreateUnverifiedUserDto|+email: string;+userType: any|]
+[User|+id: number;+username: string;+email: string;+email_is_verified: boolean;+hashed_password: string;+user_type: UserType;+report: Report\[\];+assigned_report: Report\[\];+role: UserRoles;+skills: Category\[\];+created_at: Date|]
+[&lt;enumeration&gt;UserRoles|USER;ADMIN;TECHNICIAN]
+[&lt;enumeration&gt;UserType|MAHASISWA;STAFF]
+[User|+id: number;+email: string;+role: UserRoles|]
+[&lt;enumeration&gt;ReportStatus|PENDING;PROGRESS;DONE;REJECTED;REJECTED_BY_TECHNICIAN;WITHDRAWN]
+[&lt;enumeration&gt;SlaStatus|ON_TIME;POSSIBLY_LATE;LATE]</desc>
+<g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="normal" font-style="normal">
+<g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="3.0" stroke-linejoin="round" stroke-linecap="round" stroke="#33322E">
+<g stroke="transparent" fill="transparent">
+<rect x="0.0" y="0.0" height="661.0" width="14723.0" stroke="none"></rect>
+</g>
+<g transform="translate(8, 8)" fill="#33322E">
+<g transform="translate(20, 20)" fill="#eee8d5" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+<g stroke-dasharray="6 6">
+<path d="M7542.1 261.7 L7396.75 489 L7396.75 509 L7396.8 509.0 " fill="none"></path>
+</g>
+<path d="M7546.6 264.6 L7542.1 261.7 L7537.6 258.9 L7549.3 250.5 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M7628.3 241.2 L10160.75 489 L10160.75 509 L10160.8 509.0 " fill="none"></path>
+</g>
+<path d="M7628.8 235.9 L7628.3 241.2 L7627.8 246.5 L7615.0 239.9 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M12980.0 263.8 L12980 489 L12980 521 L12980.0 521.0 " fill="none"></path>
+</g>
+<path d="M12985.3 263.8 L12980.0 263.8 L12974.7 263.8 L12980.0 250.5 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M13227.5 263.8 L13227.5 489 L13227.5 521 L13227.5 521.0 " fill="none"></path>
+</g>
+<path d="M13232.8 263.8 L13227.5 263.8 L13222.2 263.8 L13227.5 250.5 Z"></path>
+<g data-name="AppController">
+<g fill="#eee8d5" stroke="#33322E" data-name="AppController">
+<rect x="0.0" y="186.5" height="96.0" width="211.0" data-name="AppController"></rect>
+<path d="M0.0 218.5 L211.0 218.5" fill="none" data-name="AppController"></path>
+<path d="M0.0 250.5 L211.0 250.5" fill="none" data-name="AppController"></path>
+</g>
+<g transform="translate(0, 186.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AppController" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AppController" data-compartment="0">
+<a id="src/app.controller.ts.AppController" xlink:href="src/app.controller.ts"><text x="97.5" y="14.1" stroke="none" text-anchor="middle" data-name="AppController" data-compartment="0">AppController</text></a>
+
+</g>
+</g>
+<g transform="translate(0, 218.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AppController" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AppController" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="AppController" data-compartment="1">-appService: AppService</text>
+
+</g>
+</g>
+<g transform="translate(0, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AppController" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AppController" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="AppController" data-compartment="2">+getHello(): string</text>
+
+</g>
+</g>
+</g>
+<g data-name="AppModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="AppModule">
+<rect x="251.0" y="210.5" height="48.0" width="105.0" data-name="AppModule"></rect>
+<path d="M251.0 242.5 L356.0 242.5" fill="none" data-name="AppModule"></path>
+<path d="M251.0 250.5 L356.0 250.5" fill="none" data-name="AppModule"></path>
+</g>
+<g transform="translate(251, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AppModule" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AppModule" data-compartment="0">
+<a id="src/app.module.ts.AppModule" xlink:href="src/app.module.ts"><text x="44.5" y="14.1" stroke="none" text-anchor="middle" data-name="AppModule" data-compartment="0">AppModule</text></a>
+
+</g>
+</g>
+<g transform="translate(251, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AppModule" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AppModule" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(251, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AppModule" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AppModule" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="AppService">
+<g fill="#eee8d5" stroke="#33322E" data-name="AppService">
+<rect x="396.0" y="198.5" height="72.0" width="157.0" data-name="AppService"></rect>
+<path d="M396.0 230.5 L553.0 230.5" fill="none" data-name="AppService"></path>
+<path d="M396.0 238.5 L553.0 238.5" fill="none" data-name="AppService"></path>
+</g>
+<g transform="translate(396, 198.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AppService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AppService" data-compartment="0">
+<a id="src/app.service.ts.AppService" xlink:href="src/app.service.ts"><text x="70.5" y="14.1" stroke="none" text-anchor="middle" data-name="AppService" data-compartment="0">AppService</text></a>
+
+</g>
+</g>
+<g transform="translate(396, 230.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AppService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AppService" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(396, 238.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AppService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AppService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="AppService" data-compartment="2">+getHello(): string</text>
+
+</g>
+</g>
+</g>
+<g data-name="AspirationsModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="AspirationsModule">
+<rect x="593.0" y="210.5" height="48.0" width="162.0" data-name="AspirationsModule"></rect>
+<path d="M593.0 242.5 L755.0 242.5" fill="none" data-name="AspirationsModule"></path>
+<path d="M593.0 250.5 L755.0 250.5" fill="none" data-name="AspirationsModule"></path>
+</g>
+<g transform="translate(593, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AspirationsModule" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AspirationsModule" data-compartment="0">
+<a id="src/aspirations/aspirations.module.ts.AspirationsModule" xlink:href="src/aspirations/aspirations.module.ts"><text x="73.0" y="14.1" stroke="none" text-anchor="middle" data-name="AspirationsModule" data-compartment="0">AspirationsModule</text></a>
+
+</g>
+</g>
+<g transform="translate(593, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AspirationsModule" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AspirationsModule" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(593, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AspirationsModule" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AspirationsModule" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="AspirationsService">
+<g fill="#eee8d5" stroke="#33322E" data-name="AspirationsService">
+<rect x="795.0" y="210.5" height="48.0" width="163.0" data-name="AspirationsService"></rect>
+<path d="M795.0 242.5 L958.0 242.5" fill="none" data-name="AspirationsService"></path>
+<path d="M795.0 250.5 L958.0 250.5" fill="none" data-name="AspirationsService"></path>
+</g>
+<g transform="translate(795, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AspirationsService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AspirationsService" data-compartment="0">
+<a id="src/aspirations/aspirations.service.ts.AspirationsService" xlink:href="src/aspirations/aspirations.service.ts"><text x="73.5" y="14.1" stroke="none" text-anchor="middle" data-name="AspirationsService" data-compartment="0">AspirationsService</text></a>
+
+</g>
+</g>
+<g transform="translate(795, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AspirationsService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AspirationsService" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(795, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AspirationsService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AspirationsService" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="AuthController">
+<g fill="#eee8d5" stroke="#33322E" data-name="AuthController">
+<rect x="998.0" y="146.0" height="177.0" width="367.0" data-name="AuthController"></rect>
+<path d="M998.0 178.0 L1365.0 178.0" fill="none" data-name="AuthController"></path>
+<path d="M998.0 210.0 L1365.0 210.0" fill="none" data-name="AuthController"></path>
+</g>
+<g transform="translate(998, 146)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AuthController" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AuthController" data-compartment="0">
+<a id="src/auth/auth.controller.ts.AuthController" xlink:href="src/auth/auth.controller.ts"><text x="175.5" y="14.1" stroke="none" text-anchor="middle" data-name="AuthController" data-compartment="0">AuthController</text></a>
+
+</g>
+</g>
+<g transform="translate(998, 178)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AuthController" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AuthController" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="AuthController" data-compartment="1">-authService: AuthService</text>
+
+</g>
+</g>
+<g transform="translate(998, 210)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AuthController" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AuthController" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="AuthController" data-compartment="2">+register(): Promise&lt;Record&lt;string, string&gt;&gt;</text>
+<text x="0.0" y="30.3" stroke="none" data-name="AuthController" data-compartment="2">+verifyEmail(): Promise&lt;{ message: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="AuthController" data-compartment="2">}&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="AuthController" data-compartment="2">+login(): Promise&lt;Record&lt;string, string&gt;&gt;</text>
+<text x="0.0" y="78.9" stroke="none" data-name="AuthController" data-compartment="2">+logout(): { message: string</text>
+<text x="0.0" y="95.1" stroke="none" data-name="AuthController" data-compartment="2">}</text>
+
+</g>
+</g>
+</g>
+<g data-name="AuthModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="AuthModule">
+<rect x="1405.0" y="210.5" height="48.0" width="110.0" data-name="AuthModule"></rect>
+<path d="M1405.0 242.5 L1515.0 242.5" fill="none" data-name="AuthModule"></path>
+<path d="M1405.0 250.5 L1515.0 250.5" fill="none" data-name="AuthModule"></path>
+</g>
+<g transform="translate(1405, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AuthModule" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AuthModule" data-compartment="0">
+<a id="src/auth/auth.module.ts.AuthModule" xlink:href="src/auth/auth.module.ts"><text x="47.0" y="14.1" stroke="none" text-anchor="middle" data-name="AuthModule" data-compartment="0">AuthModule</text></a>
+
+</g>
+</g>
+<g transform="translate(1405, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AuthModule" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AuthModule" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(1405, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AuthModule" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AuthModule" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="AuthService">
+<g fill="#eee8d5" stroke="#33322E" data-name="AuthService">
+<rect x="1555.0" y="113.0" height="243.0" width="364.0" data-name="AuthService"></rect>
+<path d="M1555.0 145.0 L1919.0 145.0" fill="none" data-name="AuthService"></path>
+<path d="M1555.0 210.0 L1919.0 210.0" fill="none" data-name="AuthService"></path>
+</g>
+<g transform="translate(1555, 113)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AuthService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AuthService" data-compartment="0">
+<a id="src/auth/auth.service.ts.AuthService" xlink:href="src/auth/auth.service.ts"><text x="174.0" y="14.1" stroke="none" text-anchor="middle" data-name="AuthService" data-compartment="0">AuthService</text></a>
+
+</g>
+</g>
+<g transform="translate(1555, 145)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AuthService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AuthService" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="AuthService" data-compartment="1">-usersService: UsersService</text>
+<text x="0.0" y="30.3" stroke="none" data-name="AuthService" data-compartment="1">-transporter: Transporter</text>
+<text x="0.0" y="46.5" stroke="none" data-name="AuthService" data-compartment="1">-jwtService: JwtService</text>
+
+</g>
+</g>
+<g transform="translate(1555, 210)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AuthService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AuthService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="AuthService" data-compartment="2">+register(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="AuthService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="46.5" stroke="none" data-name="AuthService" data-compartment="2">+verifyEmail(): Promise&lt;{ message: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="AuthService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="78.9" stroke="none" data-name="AuthService" data-compartment="2">+sendEmailVerificationLink(): Promise&lt;any&gt;</text>
+<text x="0.0" y="95.1" stroke="none" data-name="AuthService" data-compartment="2">+createTokenLink(): Promise&lt;string&gt;</text>
+<text x="0.0" y="111.3" stroke="none" data-name="AuthService" data-compartment="2">+validateUser(): boolean</text>
+<text x="0.0" y="127.5" stroke="none" data-name="AuthService" data-compartment="2">+login(): Promise&lt;Record&lt;string, string&gt;&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="CategoriesController">
+<g fill="#eee8d5" stroke="#33322E" data-name="CategoriesController">
+<rect x="1959.0" y="138.0" height="193.0" width="414.0" data-name="CategoriesController"></rect>
+<path d="M1959.0 170.0 L2373.0 170.0" fill="none" data-name="CategoriesController"></path>
+<path d="M1959.0 202.0 L2373.0 202.0" fill="none" data-name="CategoriesController"></path>
+</g>
+<g transform="translate(1959, 138)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CategoriesController" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CategoriesController" data-compartment="0">
+<a id="src/categories/categories.controller.ts.CategoriesController" xlink:href="src/categories/categories.controller.ts"><text x="199.0" y="14.1" stroke="none" text-anchor="middle" data-name="CategoriesController" data-compartment="0">CategoriesController</text></a>
+
+</g>
+</g>
+<g transform="translate(1959, 170)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CategoriesController" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CategoriesController" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="CategoriesController" data-compartment="1">-categoriesService: CategoriesService</text>
+
+</g>
+</g>
+<g transform="translate(1959, 202)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CategoriesController" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CategoriesController" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="CategoriesController" data-compartment="2">+createCategory(): Promise&lt;Record&lt;string, any&gt;&gt;</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CategoriesController" data-compartment="2">+deleteCategory(): Promise&lt;{ message: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="CategoriesController" data-compartment="2">}&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="CategoriesController" data-compartment="2">+updateCategory(): Promise&lt;{ messsage: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="CategoriesController" data-compartment="2">category: UpdateResult</text>
+<text x="0.0" y="95.1" stroke="none" data-name="CategoriesController" data-compartment="2">}&gt;</text>
+<text x="0.0" y="111.3" stroke="none" data-name="CategoriesController" data-compartment="2">+getAllCategories(): Promise&lt;Category[]&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="CategoriesModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="CategoriesModule">
+<rect x="2413.0" y="210.5" height="48.0" width="160.0" data-name="CategoriesModule"></rect>
+<path d="M2413.0 242.5 L2573.0 242.5" fill="none" data-name="CategoriesModule"></path>
+<path d="M2413.0 250.5 L2573.0 250.5" fill="none" data-name="CategoriesModule"></path>
+</g>
+<g transform="translate(2413, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CategoriesModule" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CategoriesModule" data-compartment="0">
+<a id="src/categories/categories.module.ts.CategoriesModule" xlink:href="src/categories/categories.module.ts"><text x="72.0" y="14.1" stroke="none" text-anchor="middle" data-name="CategoriesModule" data-compartment="0">CategoriesModule</text></a>
+
+</g>
+</g>
+<g transform="translate(2413, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CategoriesModule" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CategoriesModule" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(2413, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CategoriesModule" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CategoriesModule" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="CategoriesService">
+<g fill="#eee8d5" stroke="#33322E" data-name="CategoriesService">
+<rect x="2613.0" y="105.5" height="258.0" width="395.0" data-name="CategoriesService"></rect>
+<path d="M2613.0 137.5 L3008.0 137.5" fill="none" data-name="CategoriesService"></path>
+<path d="M2613.0 185.5 L3008.0 185.5" fill="none" data-name="CategoriesService"></path>
+</g>
+<g transform="translate(2613, 105.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CategoriesService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CategoriesService" data-compartment="0">
+<a id="src/categories/categories.service.ts.CategoriesService" xlink:href="src/categories/categories.service.ts"><text x="189.5" y="14.1" stroke="none" text-anchor="middle" data-name="CategoriesService" data-compartment="0">CategoriesService</text></a>
+
+</g>
+</g>
+<g transform="translate(2613, 137.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CategoriesService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CategoriesService" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="CategoriesService" data-compartment="1">-categoryRepository: Repository&lt;Category&gt;</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CategoriesService" data-compartment="1">-priorityService: PriorityService</text>
+
+</g>
+</g>
+<g transform="translate(2613, 185.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CategoriesService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CategoriesService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="CategoriesService" data-compartment="2">+createCategory(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CategoriesService" data-compartment="2">category: Category</text>
+<text x="0.0" y="46.5" stroke="none" data-name="CategoriesService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="CategoriesService" data-compartment="2">+deleteCategory(): Promise&lt;{ message: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="CategoriesService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="95.1" stroke="none" data-name="CategoriesService" data-compartment="2">+updateCategory(): Promise&lt;{ messsage: string</text>
+<text x="0.0" y="111.3" stroke="none" data-name="CategoriesService" data-compartment="2">category: UpdateResult</text>
+<text x="0.0" y="127.5" stroke="none" data-name="CategoriesService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="143.7" stroke="none" data-name="CategoriesService" data-compartment="2">+findCategoryById(): Promise&lt;Category&gt;</text>
+<text x="0.0" y="159.9" stroke="none" data-name="CategoriesService" data-compartment="2">+getAllCategories(): Promise&lt;Category[]&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="LocationsController">
+<g fill="#eee8d5" stroke="#33322E" data-name="LocationsController">
+<rect x="3048.0" y="210.5" height="48.0" width="170.0" data-name="LocationsController"></rect>
+<path d="M3048.0 242.5 L3218.0 242.5" fill="none" data-name="LocationsController"></path>
+<path d="M3048.0 250.5 L3218.0 250.5" fill="none" data-name="LocationsController"></path>
+</g>
+<g transform="translate(3048, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LocationsController" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="LocationsController" data-compartment="0">
+<a id="src/locations/locations.controller.ts.LocationsController" xlink:href="src/locations/locations.controller.ts"><text x="77.0" y="14.1" stroke="none" text-anchor="middle" data-name="LocationsController" data-compartment="0">LocationsController</text></a>
+
+</g>
+</g>
+<g transform="translate(3048, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="LocationsController" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="LocationsController" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(3048, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="LocationsController" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="LocationsController" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="LocationsModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="LocationsModule">
+<rect x="3258.0" y="210.5" height="48.0" width="151.0" data-name="LocationsModule"></rect>
+<path d="M3258.0 242.5 L3409.0 242.5" fill="none" data-name="LocationsModule"></path>
+<path d="M3258.0 250.5 L3409.0 250.5" fill="none" data-name="LocationsModule"></path>
+</g>
+<g transform="translate(3258, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LocationsModule" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="LocationsModule" data-compartment="0">
+<a id="src/locations/locations.module.ts.LocationsModule" xlink:href="src/locations/locations.module.ts"><text x="67.5" y="14.1" stroke="none" text-anchor="middle" data-name="LocationsModule" data-compartment="0">LocationsModule</text></a>
+
+</g>
+</g>
+<g transform="translate(3258, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="LocationsModule" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="LocationsModule" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(3258, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="LocationsModule" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="LocationsModule" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="LocationsService">
+<g fill="#eee8d5" stroke="#33322E" data-name="LocationsService">
+<rect x="3449.0" y="129.5" height="210.0" width="377.0" data-name="LocationsService"></rect>
+<path d="M3449.0 161.5 L3826.0 161.5" fill="none" data-name="LocationsService"></path>
+<path d="M3449.0 193.5 L3826.0 193.5" fill="none" data-name="LocationsService"></path>
+</g>
+<g transform="translate(3449, 129.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LocationsService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="LocationsService" data-compartment="0">
+<a id="src/locations/locations.service.ts.LocationsService" xlink:href="src/locations/locations.service.ts"><text x="180.5" y="14.1" stroke="none" text-anchor="middle" data-name="LocationsService" data-compartment="0">LocationsService</text></a>
+
+</g>
+</g>
+<g transform="translate(3449, 161.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="LocationsService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="LocationsService" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="LocationsService" data-compartment="1">-locationRepository: Repository&lt;Location&gt;</text>
+
+</g>
+</g>
+<g transform="translate(3449, 193.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="LocationsService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="LocationsService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="LocationsService" data-compartment="2">+createLocation(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="LocationsService" data-compartment="2">location: { building: { id: number</text>
+<text x="0.0" y="46.5" stroke="none" data-name="LocationsService" data-compartment="2">}</text>
+<text x="0.0" y="62.7" stroke="none" data-name="LocationsService" data-compartment="2">detail: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="LocationsService" data-compartment="2">room: string</text>
+<text x="0.0" y="95.1" stroke="none" data-name="LocationsService" data-compartment="2">floor: number</text>
+<text x="0.0" y="111.3" stroke="none" data-name="LocationsService" data-compartment="2">} &amp; Location</text>
+<text x="0.0" y="127.5" stroke="none" data-name="LocationsService" data-compartment="2">}&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="PriorityController">
+<g fill="#eee8d5" stroke="#33322E" data-name="PriorityController">
+<rect x="3866.0" y="170.0" height="129.0" width="364.0" data-name="PriorityController"></rect>
+<path d="M3866.0 202.0 L4230.0 202.0" fill="none" data-name="PriorityController"></path>
+<path d="M3866.0 234.0 L4230.0 234.0" fill="none" data-name="PriorityController"></path>
+</g>
+<g transform="translate(3866, 170)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="PriorityController" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="PriorityController" data-compartment="0">
+<a id="src/priority/priority.controller.ts.PriorityController" xlink:href="src/priority/priority.controller.ts"><text x="174.0" y="14.1" stroke="none" text-anchor="middle" data-name="PriorityController" data-compartment="0">PriorityController</text></a>
+
+</g>
+</g>
+<g transform="translate(3866, 202)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PriorityController" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="PriorityController" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="PriorityController" data-compartment="1">-priorityService: PriorityService</text>
+
+</g>
+</g>
+<g transform="translate(3866, 234)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PriorityController" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="PriorityController" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="PriorityController" data-compartment="2">+createPriority(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="PriorityController" data-compartment="2">priority: Priority</text>
+<text x="0.0" y="46.5" stroke="none" data-name="PriorityController" data-compartment="2">}&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="PriorityModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="PriorityModule">
+<rect x="4270.0" y="210.5" height="48.0" width="129.0" data-name="PriorityModule"></rect>
+<path d="M4270.0 242.5 L4399.0 242.5" fill="none" data-name="PriorityModule"></path>
+<path d="M4270.0 250.5 L4399.0 250.5" fill="none" data-name="PriorityModule"></path>
+</g>
+<g transform="translate(4270, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="PriorityModule" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="PriorityModule" data-compartment="0">
+<a id="src/priority/priority.module.ts.PriorityModule" xlink:href="src/priority/priority.module.ts"><text x="56.5" y="14.1" stroke="none" text-anchor="middle" data-name="PriorityModule" data-compartment="0">PriorityModule</text></a>
+
+</g>
+</g>
+<g transform="translate(4270, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PriorityModule" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="PriorityModule" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(4270, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PriorityModule" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="PriorityModule" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="PriorityService">
+<g fill="#eee8d5" stroke="#33322E" data-name="PriorityService">
+<rect x="4439.0" y="162.0" height="145.0" width="364.0" data-name="PriorityService"></rect>
+<path d="M4439.0 194.0 L4803.0 194.0" fill="none" data-name="PriorityService"></path>
+<path d="M4439.0 226.0 L4803.0 226.0" fill="none" data-name="PriorityService"></path>
+</g>
+<g transform="translate(4439, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="PriorityService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="PriorityService" data-compartment="0">
+<a id="src/priority/priority.service.ts.PriorityService" xlink:href="src/priority/priority.service.ts"><text x="174.0" y="14.1" stroke="none" text-anchor="middle" data-name="PriorityService" data-compartment="0">PriorityService</text></a>
+
+</g>
+</g>
+<g transform="translate(4439, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PriorityService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="PriorityService" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="PriorityService" data-compartment="1">-priorityRepository: Repository&lt;Priority&gt;</text>
+
+</g>
+</g>
+<g transform="translate(4439, 226)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PriorityService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="PriorityService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="PriorityService" data-compartment="2">+createPriority(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="PriorityService" data-compartment="2">priority: Priority</text>
+<text x="0.0" y="46.5" stroke="none" data-name="PriorityService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="PriorityService" data-compartment="2">+findPriorityById(): Promise&lt;Priority&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="R2Module">
+<g fill="#eee8d5" stroke="#33322E" data-name="R2Module">
+<rect x="4843.0" y="210.5" height="48.0" width="96.0" data-name="R2Module"></rect>
+<path d="M4843.0 242.5 L4939.0 242.5" fill="none" data-name="R2Module"></path>
+<path d="M4843.0 250.5 L4939.0 250.5" fill="none" data-name="R2Module"></path>
+</g>
+<g transform="translate(4843, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="R2Module" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="R2Module" data-compartment="0">
+<a id="src/r2/r2.module.ts.R2Module" xlink:href="src/r2/r2.module.ts"><text x="40.0" y="14.1" stroke="none" text-anchor="middle" data-name="R2Module" data-compartment="0">R2Module</text></a>
+
+</g>
+</g>
+<g transform="translate(4843, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="R2Module" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="R2Module" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(4843, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="R2Module" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="R2Module" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="ReportsController">
+<g fill="#eee8d5" stroke="#33322E" data-name="ReportsController">
+<rect x="4979.0" y="49.0" height="371.0" width="367.0" data-name="ReportsController"></rect>
+<path d="M4979.0 81.0 L5346.0 81.0" fill="none" data-name="ReportsController"></path>
+<path d="M4979.0 129.0 L5346.0 129.0" fill="none" data-name="ReportsController"></path>
+</g>
+<g transform="translate(4979, 49)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ReportsController" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ReportsController" data-compartment="0">
+<a id="src/reports/reports.controller.ts.ReportsController" xlink:href="src/reports/reports.controller.ts"><text x="175.5" y="14.1" stroke="none" text-anchor="middle" data-name="ReportsController" data-compartment="0">ReportsController</text></a>
+
+</g>
+</g>
+<g transform="translate(4979, 81)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReportsController" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ReportsController" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="ReportsController" data-compartment="1">-reportsService: ReportsService</text>
+<text x="0.0" y="30.3" stroke="none" data-name="ReportsController" data-compartment="1">-authService: AuthService</text>
+
+</g>
+</g>
+<g transform="translate(4979, 129)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReportsController" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ReportsController" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="ReportsController" data-compartment="2">+crateReport(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="ReportsController" data-compartment="2">report: Report</text>
+<text x="0.0" y="46.5" stroke="none" data-name="ReportsController" data-compartment="2">}&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="ReportsController" data-compartment="2">+updateReport(): Promise&lt;{ message: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="ReportsController" data-compartment="2">report: Report</text>
+<text x="0.0" y="95.1" stroke="none" data-name="ReportsController" data-compartment="2">}&gt;</text>
+<text x="0.0" y="111.3" stroke="none" data-name="ReportsController" data-compartment="2">+findReport(): Promise&lt;Report[]&gt;</text>
+<text x="0.0" y="127.5" stroke="none" data-name="ReportsController" data-compartment="2">+findStatistic(): Promise&lt;{ total: number</text>
+<text x="0.0" y="143.7" stroke="none" data-name="ReportsController" data-compartment="2">count: { pending: number</text>
+<text x="0.0" y="159.9" stroke="none" data-name="ReportsController" data-compartment="2">progress: number</text>
+<text x="0.0" y="176.1" stroke="none" data-name="ReportsController" data-compartment="2">done: number</text>
+<text x="0.0" y="192.3" stroke="none" data-name="ReportsController" data-compartment="2">rejected: number</text>
+<text x="0.0" y="208.5" stroke="none" data-name="ReportsController" data-compartment="2">}</text>
+<text x="0.0" y="224.7" stroke="none" data-name="ReportsController" data-compartment="2">}&gt;</text>
+<text x="0.0" y="240.9" stroke="none" data-name="ReportsController" data-compartment="2">+deleteReport(): Promise&lt;{ message: string</text>
+<text x="0.0" y="257.1" stroke="none" data-name="ReportsController" data-compartment="2">report: Report</text>
+<text x="0.0" y="273.3" stroke="none" data-name="ReportsController" data-compartment="2">}&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="ReportsModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="ReportsModule">
+<rect x="5386.0" y="210.5" height="48.0" width="136.0" data-name="ReportsModule"></rect>
+<path d="M5386.0 242.5 L5522.0 242.5" fill="none" data-name="ReportsModule"></path>
+<path d="M5386.0 250.5 L5522.0 250.5" fill="none" data-name="ReportsModule"></path>
+</g>
+<g transform="translate(5386, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ReportsModule" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ReportsModule" data-compartment="0">
+<a id="src/reports/reports.module.ts.ReportsModule" xlink:href="src/reports/reports.module.ts"><text x="60.0" y="14.1" stroke="none" text-anchor="middle" data-name="ReportsModule" data-compartment="0">ReportsModule</text></a>
+
+</g>
+</g>
+<g transform="translate(5386, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReportsModule" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ReportsModule" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(5386, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReportsModule" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ReportsModule" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="ReportsService">
+<g fill="#eee8d5" stroke="#33322E" data-name="ReportsService">
+<rect x="5562.0" y="0.0" height="469.0" width="367.0" data-name="ReportsService"></rect>
+<path d="M5562.0 32.0 L5929.0 32.0" fill="none" data-name="ReportsService"></path>
+<path d="M5562.0 161.0 L5929.0 161.0" fill="none" data-name="ReportsService"></path>
+</g>
+<g transform="translate(5562, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ReportsService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ReportsService" data-compartment="0">
+<a id="src/reports/reports.service.ts.ReportsService" xlink:href="src/reports/reports.service.ts"><text x="175.5" y="14.1" stroke="none" text-anchor="middle" data-name="ReportsService" data-compartment="0">ReportsService</text></a>
+
+</g>
+</g>
+<g transform="translate(5562, 32)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReportsService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ReportsService" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="ReportsService" data-compartment="1">-reportRepository: Repository&lt;Report&gt;</text>
+<text x="0.0" y="30.3" stroke="none" data-name="ReportsService" data-compartment="1">-locationService: LocationsService</text>
+<text x="0.0" y="46.5" stroke="none" data-name="ReportsService" data-compartment="1">-categoriesService: CategoriesService</text>
+<text x="0.0" y="62.7" stroke="none" data-name="ReportsService" data-compartment="1">-buildingService: BuildingsService</text>
+<text x="0.0" y="78.9" stroke="none" data-name="ReportsService" data-compartment="1">-usersService: UsersService</text>
+<text x="0.0" y="95.1" stroke="none" data-name="ReportsService" data-compartment="1">-r2: S3Client</text>
+<text x="0.0" y="111.3" stroke="none" data-name="ReportsService" data-compartment="1">-priorityService: PriorityService</text>
+
+</g>
+</g>
+<g transform="translate(5562, 161)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReportsService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ReportsService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="ReportsService" data-compartment="2">+createReport(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="ReportsService" data-compartment="2">report: Report</text>
+<text x="0.0" y="46.5" stroke="none" data-name="ReportsService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="ReportsService" data-compartment="2">+updateReport(): Promise&lt;{ message: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="ReportsService" data-compartment="2">report: Report</text>
+<text x="0.0" y="95.1" stroke="none" data-name="ReportsService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="111.3" stroke="none" data-name="ReportsService" data-compartment="2">+findReport(): Promise&lt;Report&gt;</text>
+<text x="0.0" y="127.5" stroke="none" data-name="ReportsService" data-compartment="2">+findMany(): Promise&lt;Report[]&gt;</text>
+<text x="0.0" y="143.7" stroke="none" data-name="ReportsService" data-compartment="2">+findStatistic(): Promise&lt;{ total: number</text>
+<text x="0.0" y="159.9" stroke="none" data-name="ReportsService" data-compartment="2">count: { pending: number</text>
+<text x="0.0" y="176.1" stroke="none" data-name="ReportsService" data-compartment="2">progress: number</text>
+<text x="0.0" y="192.3" stroke="none" data-name="ReportsService" data-compartment="2">done: number</text>
+<text x="0.0" y="208.5" stroke="none" data-name="ReportsService" data-compartment="2">rejected: number</text>
+<text x="0.0" y="224.7" stroke="none" data-name="ReportsService" data-compartment="2">}</text>
+<text x="0.0" y="240.9" stroke="none" data-name="ReportsService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="257.1" stroke="none" data-name="ReportsService" data-compartment="2">+deleteReport(): Promise&lt;{ message: string</text>
+<text x="0.0" y="273.3" stroke="none" data-name="ReportsService" data-compartment="2">report: Report</text>
+<text x="0.0" y="289.5" stroke="none" data-name="ReportsService" data-compartment="2">}&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="UsersModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="UsersModule">
+<rect x="5969.0" y="210.5" height="48.0" width="120.0" data-name="UsersModule"></rect>
+<path d="M5969.0 242.5 L6089.0 242.5" fill="none" data-name="UsersModule"></path>
+<path d="M5969.0 250.5 L6089.0 250.5" fill="none" data-name="UsersModule"></path>
+</g>
+<g transform="translate(5969, 210.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="UsersModule" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="UsersModule" data-compartment="0">
+<a id="src/users/users.module.ts.UsersModule" xlink:href="src/users/users.module.ts"><text x="52.0" y="14.1" stroke="none" text-anchor="middle" data-name="UsersModule" data-compartment="0">UsersModule</text></a>
+
+</g>
+</g>
+<g transform="translate(5969, 242.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UsersModule" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="UsersModule" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(5969, 250.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UsersModule" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="UsersModule" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="UsersService">
+<g fill="#eee8d5" stroke="#33322E" data-name="UsersService">
+<rect x="6129.0" y="146.0" height="177.0" width="436.0" data-name="UsersService"></rect>
+<path d="M6129.0 178.0 L6565.0 178.0" fill="none" data-name="UsersService"></path>
+<path d="M6129.0 210.0 L6565.0 210.0" fill="none" data-name="UsersService"></path>
+</g>
+<g transform="translate(6129, 146)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="UsersService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="UsersService" data-compartment="0">
+<a id="src/users/users.service.ts.UsersService" xlink:href="src/users/users.service.ts"><text x="210.0" y="14.1" stroke="none" text-anchor="middle" data-name="UsersService" data-compartment="0">UsersService</text></a>
+
+</g>
+</g>
+<g transform="translate(6129, 178)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UsersService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="UsersService" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="UsersService" data-compartment="1">-userRepository: Repository&lt;User&gt;</text>
+
+</g>
+</g>
+<g transform="translate(6129, 210)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UsersService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="UsersService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="UsersService" data-compartment="2">+createUnverifiedUser(): Promise&lt;User&gt;</text>
+<text x="0.0" y="30.3" stroke="none" data-name="UsersService" data-compartment="2">+isEmailExist(): Promise&lt;boolean&gt;</text>
+<text x="0.0" y="46.5" stroke="none" data-name="UsersService" data-compartment="2">+isEmailExistAndVerified(): Promise&lt;Boolean&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="UsersService" data-compartment="2">+findUserByEmail(): Promise&lt;User&gt;</text>
+<text x="0.0" y="78.9" stroke="none" data-name="UsersService" data-compartment="2">+completeUserVerification(): Promise&lt;UpdateResult&gt;</text>
+<text x="0.0" y="95.1" stroke="none" data-name="UsersService" data-compartment="2">+findOneTechnicianById(): Promise&lt;User&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="Aspiration">
+<g fill="#eee8d5" stroke="#33322E" data-name="Aspiration">
+<rect x="6605.0" y="158.0" height="153.0" width="177.0" data-name="Aspiration"></rect>
+<path d="M6605.0 190.0 L6782.0 190.0" fill="none" data-name="Aspiration"></path>
+<path d="M6605.0 303.0 L6782.0 303.0" fill="none" data-name="Aspiration"></path>
+</g>
+<g transform="translate(6605, 158)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Aspiration" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Aspiration" data-compartment="0">
+<a id="src/aspirations/entity/aspiration.entity.ts.Aspiration" xlink:href="src/aspirations/entity/aspiration.entity.ts"><text x="80.5" y="14.1" stroke="none" text-anchor="middle" data-name="Aspiration" data-compartment="0">Aspiration</text></a>
+
+</g>
+</g>
+<g transform="translate(6605, 190)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Aspiration" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Aspiration" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="Aspiration" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="Aspiration" data-compartment="1">+user: User</text>
+<text x="0.0" y="46.5" stroke="none" data-name="Aspiration" data-compartment="1">+title: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="Aspiration" data-compartment="1">+category: Category</text>
+<text x="0.0" y="78.9" stroke="none" data-name="Aspiration" data-compartment="1">+img_url: string</text>
+<text x="0.0" y="95.1" stroke="none" data-name="Aspiration" data-compartment="1">+created_at: Date</text>
+
+</g>
+</g>
+<g transform="translate(6605, 303)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Aspiration" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Aspiration" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="LoginDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="LoginDto">
+<rect x="6822.0" y="190.5" height="88.0" width="156.0" data-name="LoginDto"></rect>
+<path d="M6822.0 222.5 L6978.0 222.5" fill="none" data-name="LoginDto"></path>
+<path d="M6822.0 270.5 L6978.0 270.5" fill="none" data-name="LoginDto"></path>
+</g>
+<g transform="translate(6822, 190.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LoginDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="LoginDto" data-compartment="0">
+<a id="src/auth/dto/login.dto.ts.LoginDto" xlink:href="src/auth/dto/login.dto.ts"><text x="70.0" y="14.1" stroke="none" text-anchor="middle" data-name="LoginDto" data-compartment="0">LoginDto</text></a>
+
+</g>
+</g>
+<g transform="translate(6822, 222.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="LoginDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="LoginDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="LoginDto" data-compartment="1">+email: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="LoginDto" data-compartment="1">+password: string</text>
+
+</g>
+</g>
+<g transform="translate(6822, 270.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="LoginDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="LoginDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="RegisterDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="RegisterDto">
+<rect x="7018.0" y="174.0" height="121.0" width="217.0" data-name="RegisterDto"></rect>
+<path d="M7018.0 206.0 L7235.0 206.0" fill="none" data-name="RegisterDto"></path>
+<path d="M7018.0 287.0 L7235.0 287.0" fill="none" data-name="RegisterDto"></path>
+</g>
+<g transform="translate(7018, 174)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="RegisterDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="RegisterDto" data-compartment="0">
+<a id="src/auth/dto/register.dto.ts.RegisterDto" xlink:href="src/auth/dto/register.dto.ts"><text x="100.5" y="14.1" stroke="none" text-anchor="middle" data-name="RegisterDto" data-compartment="0">RegisterDto</text></a>
+
+</g>
+</g>
+<g transform="translate(7018, 206)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RegisterDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="RegisterDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="RegisterDto" data-compartment="1">+username: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="RegisterDto" data-compartment="1">+email: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="RegisterDto" data-compartment="1">+password: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="RegisterDto" data-compartment="1">+passwordConfirm: string</text>
+
+</g>
+</g>
+<g transform="translate(7018, 287)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RegisterDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="RegisterDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="RegisterResponseDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="RegisterResponseDto">
+<rect x="7275.0" y="198.5" height="72.0" width="189.0" data-name="RegisterResponseDto"></rect>
+<path d="M7275.0 230.5 L7464.0 230.5" fill="none" data-name="RegisterResponseDto"></path>
+<path d="M7275.0 262.5 L7464.0 262.5" fill="none" data-name="RegisterResponseDto"></path>
+</g>
+<g transform="translate(7275, 198.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="RegisterResponseDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="RegisterResponseDto" data-compartment="0">
+<a id="src/auth/dto/registerResponse.dto.ts.RegisterResponseDto" xlink:href="src/auth/dto/registerResponse.dto.ts"><text x="86.5" y="14.1" stroke="none" text-anchor="middle" data-name="RegisterResponseDto" data-compartment="0">RegisterResponseDto</text></a>
+
+</g>
+</g>
+<g transform="translate(7275, 230.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RegisterResponseDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="RegisterResponseDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="RegisterResponseDto" data-compartment="1">+message: string</text>
+
+</g>
+</g>
+<g transform="translate(7275, 262.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RegisterResponseDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="RegisterResponseDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="AuthGuard">
+<g fill="#eee8d5" stroke="#33322E" data-name="AuthGuard">
+<rect x="7213.3" y="509.0" height="96.0" width="367.0" data-name="AuthGuard"></rect>
+<path d="M7213.3 541.0 L7580.3 541.0" fill="none" data-name="AuthGuard"></path>
+<path d="M7213.3 573.0 L7580.3 573.0" fill="none" data-name="AuthGuard"></path>
+</g>
+<g transform="translate(7213.25, 509)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AuthGuard" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AuthGuard" data-compartment="0">
+<a id="src/auth/guard/auth.guard.ts.AuthGuard" xlink:href="src/auth/guard/auth.guard.ts"><text x="175.5" y="14.1" stroke="none" text-anchor="middle" data-name="AuthGuard" data-compartment="0">AuthGuard</text></a>
+
+</g>
+</g>
+<g transform="translate(7213.25, 541)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AuthGuard" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AuthGuard" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="AuthGuard" data-compartment="1">-authService: AuthService</text>
+
+</g>
+</g>
+<g transform="translate(7213.25, 573)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AuthGuard" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AuthGuard" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="AuthGuard" data-compartment="2">+canActivate(): boolean | Promise&lt;boolean&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="CanActivate">
+<g fill="#eee8d5" stroke="#33322E" data-name="CanActivate">
+<rect x="7504.0" y="218.5" height="32.0" width="111.0" data-name="CanActivate"></rect>
+</g>
+<g transform="translate(7504, 218.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CanActivate" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CanActivate" data-compartment="0">
+<text x="47.5" y="14.1" stroke="none" text-anchor="middle" data-name="CanActivate" data-compartment="0">CanActivate</text>
+
+</g>
+</g>
+</g>
+<g data-name="RolesGuard">
+<g fill="#eee8d5" stroke="#33322E" data-name="RolesGuard">
+<rect x="10058.8" y="509.0" height="96.0" width="204.0" data-name="RolesGuard"></rect>
+<path d="M10058.8 541.0 L10262.8 541.0" fill="none" data-name="RolesGuard"></path>
+<path d="M10058.8 573.0 L10262.8 573.0" fill="none" data-name="RolesGuard"></path>
+</g>
+<g transform="translate(10058.75, 509)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="RolesGuard" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="RolesGuard" data-compartment="0">
+<a id="src/auth/guard/roles.guard.ts.RolesGuard" xlink:href="src/auth/guard/roles.guard.ts"><text x="94.0" y="14.1" stroke="none" text-anchor="middle" data-name="RolesGuard" data-compartment="0">RolesGuard</text></a>
+
+</g>
+</g>
+<g transform="translate(10058.75, 541)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RolesGuard" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="RolesGuard" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="RolesGuard" data-compartment="1">-reflector: Reflector</text>
+
+</g>
+</g>
+<g transform="translate(10058.75, 573)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RolesGuard" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="RolesGuard" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="RolesGuard" data-compartment="2">+canActivate(): boolean</text>
+
+</g>
+</g>
+</g>
+<g data-name="CreateCategoryDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="CreateCategoryDto">
+<rect x="7655.0" y="190.5" height="88.0" width="168.0" data-name="CreateCategoryDto"></rect>
+<path d="M7655.0 222.5 L7823.0 222.5" fill="none" data-name="CreateCategoryDto"></path>
+<path d="M7655.0 270.5 L7823.0 270.5" fill="none" data-name="CreateCategoryDto"></path>
+</g>
+<g transform="translate(7655, 190.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CreateCategoryDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CreateCategoryDto" data-compartment="0">
+<a id="src/categories/dto/create-category.dto.ts.CreateCategoryDto" xlink:href="src/categories/dto/create-category.dto.ts"><text x="76.0" y="14.1" stroke="none" text-anchor="middle" data-name="CreateCategoryDto" data-compartment="0">CreateCategoryDto</text></a>
+
+</g>
+</g>
+<g transform="translate(7655, 222.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateCategoryDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CreateCategoryDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="CreateCategoryDto" data-compartment="1">+name: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CreateCategoryDto" data-compartment="1">+priority: number</text>
+
+</g>
+</g>
+<g transform="translate(7655, 270.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateCategoryDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CreateCategoryDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="UpdateDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="UpdateDto">
+<rect x="7863.0" y="182.0" height="105.0" width="165.0" data-name="UpdateDto"></rect>
+<path d="M7863.0 214.0 L8028.0 214.0" fill="none" data-name="UpdateDto"></path>
+<path d="M7863.0 279.0 L8028.0 279.0" fill="none" data-name="UpdateDto"></path>
+</g>
+<g transform="translate(7863, 182)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="UpdateDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="UpdateDto" data-compartment="0">
+<a id="src/categories/dto/update.dto.ts.UpdateDto" xlink:href="src/categories/dto/update.dto.ts"><text x="74.5" y="14.1" stroke="none" text-anchor="middle" data-name="UpdateDto" data-compartment="0">UpdateDto</text></a>
+
+</g>
+</g>
+<g transform="translate(7863, 214)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UpdateDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="UpdateDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="UpdateDto" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="UpdateDto" data-compartment="1">+name: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="UpdateDto" data-compartment="1">+priorityId: number</text>
+
+</g>
+</g>
+<g transform="translate(7863, 279)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UpdateDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="UpdateDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="Category">
+<g fill="#eee8d5" stroke="#33322E" data-name="Category">
+<rect x="8068.0" y="150.0" height="169.0" width="193.0" data-name="Category"></rect>
+<path d="M8068.0 182.0 L8261.0 182.0" fill="none" data-name="Category"></path>
+<path d="M8068.0 311.0 L8261.0 311.0" fill="none" data-name="Category"></path>
+</g>
+<g transform="translate(8068, 150)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Category" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Category" data-compartment="0">
+<a id="src/categories/entity/category.entity.ts.Category" xlink:href="src/categories/entity/category.entity.ts"><text x="88.5" y="14.1" stroke="none" text-anchor="middle" data-name="Category" data-compartment="0">Category</text></a>
+
+</g>
+</g>
+<g transform="translate(8068, 182)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Category" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Category" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="Category" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="Category" data-compartment="1">+name: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="Category" data-compartment="1">+isSystem: boolean</text>
+<text x="0.0" y="62.7" stroke="none" data-name="Category" data-compartment="1">+priority: Priority</text>
+<text x="0.0" y="78.9" stroke="none" data-name="Category" data-compartment="1">+report: Report[]</text>
+<text x="0.0" y="95.1" stroke="none" data-name="Category" data-compartment="1">+aspiration: Aspiration</text>
+<text x="0.0" y="111.3" stroke="none" data-name="Category" data-compartment="1">+createdAt: Date</text>
+
+</g>
+</g>
+<g transform="translate(8068, 311)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Category" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Category" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="BuildingsController">
+<g fill="#eee8d5" stroke="#33322E" data-name="BuildingsController">
+<rect x="8301.0" y="162.0" height="145.0" width="372.0" data-name="BuildingsController"></rect>
+<path d="M8301.0 194.0 L8673.0 194.0" fill="none" data-name="BuildingsController"></path>
+<path d="M8301.0 226.0 L8673.0 226.0" fill="none" data-name="BuildingsController"></path>
+</g>
+<g transform="translate(8301, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BuildingsController" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="BuildingsController" data-compartment="0">
+<a id="src/locations/buildings/buildings.controller.ts.BuildingsController" xlink:href="src/locations/buildings/buildings.controller.ts"><text x="178.0" y="14.1" stroke="none" text-anchor="middle" data-name="BuildingsController" data-compartment="0">BuildingsController</text></a>
+
+</g>
+</g>
+<g transform="translate(8301, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BuildingsController" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="BuildingsController" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="BuildingsController" data-compartment="1">-buildingService: BuildingsService</text>
+
+</g>
+</g>
+<g transform="translate(8301, 226)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BuildingsController" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="BuildingsController" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="BuildingsController" data-compartment="2">+createBuilding(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="BuildingsController" data-compartment="2">building: Building</text>
+<text x="0.0" y="46.5" stroke="none" data-name="BuildingsController" data-compartment="2">}&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="BuildingsController" data-compartment="2">+getAllBuildings(): Promise&lt;Building[]&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="BuildingsService">
+<g fill="#eee8d5" stroke="#33322E" data-name="BuildingsService">
+<rect x="8713.0" y="146.0" height="177.0" width="372.0" data-name="BuildingsService"></rect>
+<path d="M8713.0 178.0 L9085.0 178.0" fill="none" data-name="BuildingsService"></path>
+<path d="M8713.0 226.0 L9085.0 226.0" fill="none" data-name="BuildingsService"></path>
+</g>
+<g transform="translate(8713, 146)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BuildingsService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="BuildingsService" data-compartment="0">
+<a id="src/locations/buildings/buildings.service.ts.BuildingsService" xlink:href="src/locations/buildings/buildings.service.ts"><text x="178.0" y="14.1" stroke="none" text-anchor="middle" data-name="BuildingsService" data-compartment="0">BuildingsService</text></a>
+
+</g>
+</g>
+<g transform="translate(8713, 178)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BuildingsService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="BuildingsService" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="BuildingsService" data-compartment="1">-buildingRepository: Repository&lt;Building&gt;</text>
+<text x="0.0" y="30.3" stroke="none" data-name="BuildingsService" data-compartment="1">-facultiesService: FacultiesService</text>
+
+</g>
+</g>
+<g transform="translate(8713, 226)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BuildingsService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="BuildingsService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="BuildingsService" data-compartment="2">+createBuilding(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="BuildingsService" data-compartment="2">building: Building</text>
+<text x="0.0" y="46.5" stroke="none" data-name="BuildingsService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="BuildingsService" data-compartment="2">+findMany(): Promise&lt;Building[]&gt;</text>
+<text x="0.0" y="78.9" stroke="none" data-name="BuildingsService" data-compartment="2">+findOneById(): Promise&lt;Building&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="BuildingsFilterDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="BuildingsFilterDto">
+<rect x="9125.0" y="174.0" height="121.0" width="156.0" data-name="BuildingsFilterDto"></rect>
+<path d="M9125.0 206.0 L9281.0 206.0" fill="none" data-name="BuildingsFilterDto"></path>
+<path d="M9125.0 287.0 L9281.0 287.0" fill="none" data-name="BuildingsFilterDto"></path>
+</g>
+<g transform="translate(9125, 174)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BuildingsFilterDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="BuildingsFilterDto" data-compartment="0">
+<a id="src/locations/dto/buildings-filter.dto.ts.BuildingsFilterDto" xlink:href="src/locations/dto/buildings-filter.dto.ts"><text x="70.0" y="14.1" stroke="none" text-anchor="middle" data-name="BuildingsFilterDto" data-compartment="0">BuildingsFilterDto</text></a>
+
+</g>
+</g>
+<g transform="translate(9125, 206)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BuildingsFilterDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="BuildingsFilterDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="BuildingsFilterDto" data-compartment="1">+name: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="BuildingsFilterDto" data-compartment="1">+floors: number</text>
+<text x="0.0" y="46.5" stroke="none" data-name="BuildingsFilterDto" data-compartment="1">+isGeneral: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="BuildingsFilterDto" data-compartment="1">+faculty: number</text>
+
+</g>
+</g>
+<g transform="translate(9125, 287)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BuildingsFilterDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="BuildingsFilterDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="CreateBuildingDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="CreateBuildingDto">
+<rect x="9321.0" y="182.0" height="105.0" width="163.0" data-name="CreateBuildingDto"></rect>
+<path d="M9321.0 214.0 L9484.0 214.0" fill="none" data-name="CreateBuildingDto"></path>
+<path d="M9321.0 279.0 L9484.0 279.0" fill="none" data-name="CreateBuildingDto"></path>
+</g>
+<g transform="translate(9321, 182)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CreateBuildingDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CreateBuildingDto" data-compartment="0">
+<a id="src/locations/dto/create-building.dto.ts.CreateBuildingDto" xlink:href="src/locations/dto/create-building.dto.ts"><text x="73.5" y="14.1" stroke="none" text-anchor="middle" data-name="CreateBuildingDto" data-compartment="0">CreateBuildingDto</text></a>
+
+</g>
+</g>
+<g transform="translate(9321, 214)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateBuildingDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CreateBuildingDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="CreateBuildingDto" data-compartment="1">+name: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CreateBuildingDto" data-compartment="1">+floors: number</text>
+<text x="0.0" y="46.5" stroke="none" data-name="CreateBuildingDto" data-compartment="1">+facultyId: number</text>
+
+</g>
+</g>
+<g transform="translate(9321, 279)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateBuildingDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CreateBuildingDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="createFacultyDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="createFacultyDto">
+<rect x="9524.0" y="190.5" height="88.0" width="150.0" data-name="createFacultyDto"></rect>
+<path d="M9524.0 222.5 L9674.0 222.5" fill="none" data-name="createFacultyDto"></path>
+<path d="M9524.0 270.5 L9674.0 270.5" fill="none" data-name="createFacultyDto"></path>
+</g>
+<g transform="translate(9524, 190.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="createFacultyDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="createFacultyDto" data-compartment="0">
+<a id="src/locations/dto/create-faculty.dt0.ts.createFacultyDto" xlink:href="src/locations/dto/create-faculty.dt0.ts"><text x="67.0" y="14.1" stroke="none" text-anchor="middle" data-name="createFacultyDto" data-compartment="0">createFacultyDto</text></a>
+
+</g>
+</g>
+<g transform="translate(9524, 222.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="createFacultyDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="createFacultyDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="createFacultyDto" data-compartment="1">+name: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="createFacultyDto" data-compartment="1">+code: string</text>
+
+</g>
+</g>
+<g transform="translate(9524, 270.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="createFacultyDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="createFacultyDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="CreateLocationDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="CreateLocationDto">
+<rect x="9714.0" y="174.0" height="121.0" width="173.0" data-name="CreateLocationDto"></rect>
+<path d="M9714.0 206.0 L9887.0 206.0" fill="none" data-name="CreateLocationDto"></path>
+<path d="M9714.0 287.0 L9887.0 287.0" fill="none" data-name="CreateLocationDto"></path>
+</g>
+<g transform="translate(9714, 174)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CreateLocationDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CreateLocationDto" data-compartment="0">
+<a id="src/locations/dto/create-location.dto.ts.CreateLocationDto" xlink:href="src/locations/dto/create-location.dto.ts"><text x="78.5" y="14.1" stroke="none" text-anchor="middle" data-name="CreateLocationDto" data-compartment="0">CreateLocationDto</text></a>
+
+</g>
+</g>
+<g transform="translate(9714, 206)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateLocationDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CreateLocationDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="CreateLocationDto" data-compartment="1">+buildingId: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CreateLocationDto" data-compartment="1">+floor: number</text>
+<text x="0.0" y="46.5" stroke="none" data-name="CreateLocationDto" data-compartment="1">+detail: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="CreateLocationDto" data-compartment="1">+room: string</text>
+
+</g>
+</g>
+<g transform="translate(9714, 287)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateLocationDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CreateLocationDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="Building">
+<g fill="#eee8d5" stroke="#33322E" data-name="Building">
+<rect x="9927.0" y="141.5" height="186.0" width="176.0" data-name="Building"></rect>
+<path d="M9927.0 173.5 L10103.0 173.5" fill="none" data-name="Building"></path>
+<path d="M9927.0 319.5 L10103.0 319.5" fill="none" data-name="Building"></path>
+</g>
+<g transform="translate(9927, 141.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Building" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Building" data-compartment="0">
+<a id="src/locations/entity/building.entity.ts.Building" xlink:href="src/locations/entity/building.entity.ts"><text x="80.0" y="14.1" stroke="none" text-anchor="middle" data-name="Building" data-compartment="0">Building</text></a>
+
+</g>
+</g>
+<g transform="translate(9927, 173.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Building" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Building" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="Building" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="Building" data-compartment="1">+name: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="Building" data-compartment="1">+floors: number</text>
+<text x="0.0" y="62.7" stroke="none" data-name="Building" data-compartment="1">+faculty: Faculty</text>
+<text x="0.0" y="78.9" stroke="none" data-name="Building" data-compartment="1">+location: Location[]</text>
+<text x="0.0" y="95.1" stroke="none" data-name="Building" data-compartment="1">+isSystem: boolean</text>
+<text x="0.0" y="111.3" stroke="none" data-name="Building" data-compartment="1">+isGeneral: boolean</text>
+<text x="0.0" y="127.5" stroke="none" data-name="Building" data-compartment="1">+created_at: Date</text>
+
+</g>
+</g>
+<g transform="translate(9927, 319.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Building" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Building" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="Faculty">
+<g fill="#eee8d5" stroke="#33322E" data-name="Faculty">
+<rect x="10143.0" y="158.0" height="153.0" width="171.0" data-name="Faculty"></rect>
+<path d="M10143.0 190.0 L10314.0 190.0" fill="none" data-name="Faculty"></path>
+<path d="M10143.0 303.0 L10314.0 303.0" fill="none" data-name="Faculty"></path>
+</g>
+<g transform="translate(10143, 158)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Faculty" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Faculty" data-compartment="0">
+<a id="src/locations/entity/faculty.entity.ts.Faculty" xlink:href="src/locations/entity/faculty.entity.ts"><text x="77.5" y="14.1" stroke="none" text-anchor="middle" data-name="Faculty" data-compartment="0">Faculty</text></a>
+
+</g>
+</g>
+<g transform="translate(10143, 190)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Faculty" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Faculty" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="Faculty" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="Faculty" data-compartment="1">+name: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="Faculty" data-compartment="1">+code: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="Faculty" data-compartment="1">+building: Building[]</text>
+<text x="0.0" y="78.9" stroke="none" data-name="Faculty" data-compartment="1">+isSystem: boolean</text>
+<text x="0.0" y="95.1" stroke="none" data-name="Faculty" data-compartment="1">+createdAt: Date</text>
+
+</g>
+</g>
+<g transform="translate(10143, 303)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Faculty" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Faculty" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="Location">
+<g fill="#eee8d5" stroke="#33322E" data-name="Location">
+<rect x="10354.0" y="141.5" height="186.0" width="171.0" data-name="Location"></rect>
+<path d="M10354.0 173.5 L10525.0 173.5" fill="none" data-name="Location"></path>
+<path d="M10354.0 319.5 L10525.0 319.5" fill="none" data-name="Location"></path>
+</g>
+<g transform="translate(10354, 141.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Location" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Location" data-compartment="0">
+<a id="src/reports/dto/update-report.dto.ts.Location" xlink:href="src/reports/dto/update-report.dto.ts"><text x="77.5" y="14.1" stroke="none" text-anchor="middle" data-name="Location" data-compartment="0">Location</text></a>
+
+</g>
+</g>
+<g transform="translate(10354, 173.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Location" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Location" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="Location" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="Location" data-compartment="1">+building: Building</text>
+<text x="0.0" y="46.5" stroke="none" data-name="Location" data-compartment="1">+floor: number</text>
+<text x="0.0" y="62.7" stroke="none" data-name="Location" data-compartment="1">+room: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="Location" data-compartment="1">+detail: string</text>
+<text x="0.0" y="95.1" stroke="none" data-name="Location" data-compartment="1">+report: Report</text>
+<text x="0.0" y="111.3" stroke="none" data-name="Location" data-compartment="1">+isSystem: boolean</text>
+<text x="0.0" y="127.5" stroke="none" data-name="Location" data-compartment="1">+createdAt: Date</text>
+
+</g>
+</g>
+<g transform="translate(10354, 319.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Location" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Location" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="FacultiesController">
+<g fill="#eee8d5" stroke="#33322E" data-name="FacultiesController">
+<rect x="10565.0" y="170.0" height="129.0" width="366.0" data-name="FacultiesController"></rect>
+<path d="M10565.0 202.0 L10931.0 202.0" fill="none" data-name="FacultiesController"></path>
+<path d="M10565.0 234.0 L10931.0 234.0" fill="none" data-name="FacultiesController"></path>
+</g>
+<g transform="translate(10565, 170)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="FacultiesController" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="FacultiesController" data-compartment="0">
+<a id="src/locations/faculties/faculties.controller.ts.FacultiesController" xlink:href="src/locations/faculties/faculties.controller.ts"><text x="175.0" y="14.1" stroke="none" text-anchor="middle" data-name="FacultiesController" data-compartment="0">FacultiesController</text></a>
+
+</g>
+</g>
+<g transform="translate(10565, 202)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="FacultiesController" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="FacultiesController" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="FacultiesController" data-compartment="1">-facultiesService: FacultiesService</text>
+
+</g>
+</g>
+<g transform="translate(10565, 234)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="FacultiesController" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="FacultiesController" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="FacultiesController" data-compartment="2">+createFaculty(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="FacultiesController" data-compartment="2">}&gt;</text>
+<text x="0.0" y="46.5" stroke="none" data-name="FacultiesController" data-compartment="2">+getAllFaculties(): Promise&lt;Faculty[]&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="FacultiesService">
+<g fill="#eee8d5" stroke="#33322E" data-name="FacultiesService">
+<rect x="10971.0" y="162.0" height="145.0" width="366.0" data-name="FacultiesService"></rect>
+<path d="M10971.0 194.0 L11337.0 194.0" fill="none" data-name="FacultiesService"></path>
+<path d="M10971.0 226.0 L11337.0 226.0" fill="none" data-name="FacultiesService"></path>
+</g>
+<g transform="translate(10971, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="FacultiesService" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="FacultiesService" data-compartment="0">
+<a id="src/locations/faculties/faculties.service.ts.FacultiesService" xlink:href="src/locations/faculties/faculties.service.ts"><text x="175.0" y="14.1" stroke="none" text-anchor="middle" data-name="FacultiesService" data-compartment="0">FacultiesService</text></a>
+
+</g>
+</g>
+<g transform="translate(10971, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="FacultiesService" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="FacultiesService" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="FacultiesService" data-compartment="1">-facultyRepository: Repository&lt;Faculty&gt;</text>
+
+</g>
+</g>
+<g transform="translate(10971, 226)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="FacultiesService" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="FacultiesService" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="FacultiesService" data-compartment="2">+createFaculty(): Promise&lt;{ message: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="FacultiesService" data-compartment="2">}&gt;</text>
+<text x="0.0" y="46.5" stroke="none" data-name="FacultiesService" data-compartment="2">+findFacultyById(): Promise&lt;Faculty&gt;</text>
+<text x="0.0" y="62.7" stroke="none" data-name="FacultiesService" data-compartment="2">+getAllFaculties(): Promise&lt;Faculty[]&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="CreatePriorityDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="CreatePriorityDto">
+<rect x="11377.0" y="182.0" height="105.0" width="166.0" data-name="CreatePriorityDto"></rect>
+<path d="M11377.0 214.0 L11543.0 214.0" fill="none" data-name="CreatePriorityDto"></path>
+<path d="M11377.0 279.0 L11543.0 279.0" fill="none" data-name="CreatePriorityDto"></path>
+</g>
+<g transform="translate(11377, 182)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CreatePriorityDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CreatePriorityDto" data-compartment="0">
+<a id="src/priority/dto/create-priority.dto.ts.CreatePriorityDto" xlink:href="src/priority/dto/create-priority.dto.ts"><text x="75.0" y="14.1" stroke="none" text-anchor="middle" data-name="CreatePriorityDto" data-compartment="0">CreatePriorityDto</text></a>
+
+</g>
+</g>
+<g transform="translate(11377, 214)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreatePriorityDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CreatePriorityDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="CreatePriorityDto" data-compartment="1">+name: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CreatePriorityDto" data-compartment="1">+slaHours: number</text>
+<text x="0.0" y="46.5" stroke="none" data-name="CreatePriorityDto" data-compartment="1">+weight: number</text>
+
+</g>
+</g>
+<g transform="translate(11377, 279)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreatePriorityDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CreatePriorityDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="Priority">
+<g fill="#eee8d5" stroke="#33322E" data-name="Priority">
+<rect x="11583.0" y="158.0" height="153.0" width="187.0" data-name="Priority"></rect>
+<path d="M11583.0 190.0 L11770.0 190.0" fill="none" data-name="Priority"></path>
+<path d="M11583.0 303.0 L11770.0 303.0" fill="none" data-name="Priority"></path>
+</g>
+<g transform="translate(11583, 158)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Priority" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Priority" data-compartment="0">
+<a id="src/priority/entity/priority.entity.ts.Priority" xlink:href="src/priority/entity/priority.entity.ts"><text x="85.5" y="14.1" stroke="none" text-anchor="middle" data-name="Priority" data-compartment="0">Priority</text></a>
+
+</g>
+</g>
+<g transform="translate(11583, 190)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Priority" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Priority" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="Priority" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="Priority" data-compartment="1">+name: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="Priority" data-compartment="1">+slaHours: number</text>
+<text x="0.0" y="62.7" stroke="none" data-name="Priority" data-compartment="1">+weight: number</text>
+<text x="0.0" y="78.9" stroke="none" data-name="Priority" data-compartment="1">+category: Category[]</text>
+<text x="0.0" y="95.1" stroke="none" data-name="Priority" data-compartment="1">+report: Report[]</text>
+
+</g>
+</g>
+<g transform="translate(11583, 303)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Priority" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Priority" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="CreateReportDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="CreateReportDto">
+<rect x="11810.0" y="158.0" height="153.0" width="180.0" data-name="CreateReportDto"></rect>
+<path d="M11810.0 190.0 L11990.0 190.0" fill="none" data-name="CreateReportDto"></path>
+<path d="M11810.0 303.0 L11990.0 303.0" fill="none" data-name="CreateReportDto"></path>
+</g>
+<g transform="translate(11810, 158)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CreateReportDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CreateReportDto" data-compartment="0">
+<a id="src/reports/dto/create-report.dto.ts.CreateReportDto" xlink:href="src/reports/dto/create-report.dto.ts"><text x="82.0" y="14.1" stroke="none" text-anchor="middle" data-name="CreateReportDto" data-compartment="0">CreateReportDto</text></a>
+
+</g>
+</g>
+<g transform="translate(11810, 190)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateReportDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CreateReportDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="CreateReportDto" data-compartment="1">+categoryId: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CreateReportDto" data-compartment="1">+buildingId: number</text>
+<text x="0.0" y="46.5" stroke="none" data-name="CreateReportDto" data-compartment="1">+room: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="CreateReportDto" data-compartment="1">+floor: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="CreateReportDto" data-compartment="1">+detail: string</text>
+<text x="0.0" y="95.1" stroke="none" data-name="CreateReportDto" data-compartment="1">+description: string</text>
+
+</g>
+</g>
+<g transform="translate(11810, 303)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateReportDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CreateReportDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="FindReportDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="FindReportDto">
+<rect x="12030.0" y="141.5" height="186.0" width="241.0" data-name="FindReportDto"></rect>
+<path d="M12030.0 173.5 L12271.0 173.5" fill="none" data-name="FindReportDto"></path>
+<path d="M12030.0 319.5 L12271.0 319.5" fill="none" data-name="FindReportDto"></path>
+</g>
+<g transform="translate(12030, 141.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="FindReportDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="FindReportDto" data-compartment="0">
+<a id="src/reports/dto/find-report.dto.ts.FindReportDto" xlink:href="src/reports/dto/find-report.dto.ts"><text x="112.5" y="14.1" stroke="none" text-anchor="middle" data-name="FindReportDto" data-compartment="0">FindReportDto</text></a>
+
+</g>
+</g>
+<g transform="translate(12030, 173.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="FindReportDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="FindReportDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="FindReportDto" data-compartment="1">+id: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="FindReportDto" data-compartment="1">+building: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="FindReportDto" data-compartment="1">+category: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="FindReportDto" data-compartment="1">+faculty: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="FindReportDto" data-compartment="1">+from: string</text>
+<text x="0.0" y="95.1" stroke="none" data-name="FindReportDto" data-compartment="1">+page: number</text>
+<text x="0.0" y="111.3" stroke="none" data-name="FindReportDto" data-compartment="1">+limit: number</text>
+<text x="0.0" y="127.5" stroke="none" data-name="FindReportDto" data-compartment="1">+status: ReportStatusWithAll</text>
+
+</g>
+</g>
+<g transform="translate(12030, 319.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="FindReportDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="FindReportDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="UpdateReportDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="UpdateReportDto">
+<rect x="12311.0" y="133.5" height="202.0" width="269.0" data-name="UpdateReportDto"></rect>
+<path d="M12311.0 165.5 L12580.0 165.5" fill="none" data-name="UpdateReportDto"></path>
+<path d="M12311.0 327.5 L12580.0 327.5" fill="none" data-name="UpdateReportDto"></path>
+</g>
+<g transform="translate(12311, 133.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="UpdateReportDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="UpdateReportDto" data-compartment="0">
+<a id="src/reports/dto/update-report.dto.ts.UpdateReportDto" xlink:href="src/reports/dto/update-report.dto.ts"><text x="126.5" y="14.1" stroke="none" text-anchor="middle" data-name="UpdateReportDto" data-compartment="0">UpdateReportDto</text></a>
+
+</g>
+</g>
+<g transform="translate(12311, 165.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UpdateReportDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="UpdateReportDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="UpdateReportDto" data-compartment="1">+reportId: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="UpdateReportDto" data-compartment="1">+categoryId: number</text>
+<text x="0.0" y="46.5" stroke="none" data-name="UpdateReportDto" data-compartment="1">+location: Location</text>
+<text x="0.0" y="62.7" stroke="none" data-name="UpdateReportDto" data-compartment="1">+status: string</text>
+<text x="0.0" y="78.9" stroke="none" data-name="UpdateReportDto" data-compartment="1">+description: string</text>
+<text x="0.0" y="95.1" stroke="none" data-name="UpdateReportDto" data-compartment="1">+adminNote: string</text>
+<text x="0.0" y="111.3" stroke="none" data-name="UpdateReportDto" data-compartment="1">+technicianNote: string</text>
+<text x="0.0" y="127.5" stroke="none" data-name="UpdateReportDto" data-compartment="1">+priority: number</text>
+<text x="0.0" y="143.7" stroke="none" data-name="UpdateReportDto" data-compartment="1">+assignedTechnicianId: number</text>
+
+</g>
+</g>
+<g transform="translate(12311, 327.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UpdateReportDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="UpdateReportDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="Report">
+<g fill="#eee8d5" stroke="#33322E" data-name="Report">
+<rect x="12620.0" y="93.0" height="283.0" width="231.0" data-name="Report"></rect>
+<path d="M12620.0 125.0 L12851.0 125.0" fill="none" data-name="Report"></path>
+<path d="M12620.0 368.0 L12851.0 368.0" fill="none" data-name="Report"></path>
+</g>
+<g transform="translate(12620, 93)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Report" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Report" data-compartment="0">
+<a id="src/reports/entity/report.entity.ts.Report" xlink:href="src/reports/entity/report.entity.ts"><text x="107.5" y="14.1" stroke="none" text-anchor="middle" data-name="Report" data-compartment="0">Report</text></a>
+
+</g>
+</g>
+<g transform="translate(12620, 125)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Report" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Report" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="Report" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="Report" data-compartment="1">+user: User</text>
+<text x="0.0" y="46.5" stroke="none" data-name="Report" data-compartment="1">+assignedTechnician: User</text>
+<text x="0.0" y="62.7" stroke="none" data-name="Report" data-compartment="1">+category: Category</text>
+<text x="0.0" y="78.9" stroke="none" data-name="Report" data-compartment="1">+slaDate: Date</text>
+<text x="0.0" y="95.1" stroke="none" data-name="Report" data-compartment="1">+location: Location</text>
+<text x="0.0" y="111.3" stroke="none" data-name="Report" data-compartment="1">+description: string</text>
+<text x="0.0" y="127.5" stroke="none" data-name="Report" data-compartment="1">+adminNote: string</text>
+<text x="0.0" y="143.7" stroke="none" data-name="Report" data-compartment="1">+status: ReportStatus</text>
+<text x="0.0" y="159.9" stroke="none" data-name="Report" data-compartment="1">+slaStatus: SlaStatus</text>
+<text x="0.0" y="176.1" stroke="none" data-name="Report" data-compartment="1">+priority: Priority</text>
+<text x="0.0" y="192.3" stroke="none" data-name="Report" data-compartment="1">+technicianNote: string</text>
+<text x="0.0" y="208.5" stroke="none" data-name="Report" data-compartment="1">+imgUrl: string</text>
+<text x="0.0" y="224.7" stroke="none" data-name="Report" data-compartment="1">+createdAt: Date</text>
+
+</g>
+</g>
+<g transform="translate(12620, 368)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Report" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Report" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="ParseJsonPipe">
+<g fill="#eee8d5" stroke="#33322E" data-name="ParseJsonPipe">
+<rect x="12904.0" y="521.0" height="72.0" width="152.0" data-name="ParseJsonPipe"></rect>
+<path d="M12904.0 553.0 L13056.0 553.0" fill="none" data-name="ParseJsonPipe"></path>
+<path d="M12904.0 561.0 L13056.0 561.0" fill="none" data-name="ParseJsonPipe"></path>
+</g>
+<g transform="translate(12904, 521)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ParseJsonPipe" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ParseJsonPipe" data-compartment="0">
+<a id="src/reports/pipes/parse-json-pipe.pipe.ts.ParseJsonPipe" xlink:href="src/reports/pipes/parse-json-pipe.pipe.ts"><text x="68.0" y="14.1" stroke="none" text-anchor="middle" data-name="ParseJsonPipe" data-compartment="0">ParseJsonPipe</text></a>
+
+</g>
+</g>
+<g transform="translate(12904, 553)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ParseJsonPipe" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ParseJsonPipe" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(12904, 561)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ParseJsonPipe" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ParseJsonPipe" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="ParseJsonPipe" data-compartment="2">+transform(): any</text>
+
+</g>
+</g>
+</g>
+<g data-name="PipeTransform&lt;T,R&gt;">
+<g fill="#eee8d5" stroke="#33322E" data-name="PipeTransform&lt;T,R&gt;">
+<rect x="12891.0" y="218.5" height="32.0" width="178.0" data-name="PipeTransform&lt;T,R&gt;"></rect>
+</g>
+<g transform="translate(12891, 218.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="PipeTransform&lt;T,R&gt;" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="PipeTransform&lt;T,R&gt;" data-compartment="0">
+<text x="81.0" y="14.1" stroke="none" text-anchor="middle" data-name="PipeTransform&lt;T,R&gt;" data-compartment="0">PipeTransform&lt;T,R&gt;</text>
+
+</g>
+</g>
+</g>
+<g data-name="MatchConstraint">
+<g fill="#eee8d5" stroke="#33322E" data-name="MatchConstraint">
+<rect x="13140.5" y="521.0" height="72.0" width="174.0" data-name="MatchConstraint"></rect>
+<path d="M13140.5 553.0 L13314.5 553.0" fill="none" data-name="MatchConstraint"></path>
+<path d="M13140.5 561.0 L13314.5 561.0" fill="none" data-name="MatchConstraint"></path>
+</g>
+<g transform="translate(13140.5, 521)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="MatchConstraint" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="MatchConstraint" data-compartment="0">
+<a id="src/shared/decorators/match.decorator.ts.MatchConstraint" xlink:href="src/shared/decorators/match.decorator.ts"><text x="79.0" y="14.1" stroke="none" text-anchor="middle" data-name="MatchConstraint" data-compartment="0">MatchConstraint</text></a>
+
+</g>
+</g>
+<g transform="translate(13140.5, 553)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MatchConstraint" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" data-name="MatchConstraint" data-compartment="1">
+
+</g>
+</g>
+<g transform="translate(13140.5, 561)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MatchConstraint" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="MatchConstraint" data-compartment="2">
+<text x="0.0" y="14.1" stroke="none" data-name="MatchConstraint" data-compartment="2">+validate(): boolean</text>
+
+</g>
+</g>
+</g>
+<g data-name="ValidatorConstraintInterface">
+<g fill="#eee8d5" stroke="#33322E" data-name="ValidatorConstraintInterface">
+<rect x="13109.0" y="218.5" height="32.0" width="237.0" data-name="ValidatorConstraintInterface"></rect>
+</g>
+<g transform="translate(13109, 218.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ValidatorConstraintInterface" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ValidatorConstraintInterface" data-compartment="0">
+<text x="110.5" y="14.1" stroke="none" text-anchor="middle" data-name="ValidatorConstraintInterface" data-compartment="0">ValidatorConstraintInterface</text>
+
+</g>
+</g>
+</g>
+<g data-name="CreateUnverifiedUserDto">
+<g fill="#eee8d5" stroke="#33322E" data-name="CreateUnverifiedUserDto">
+<rect x="13386.0" y="190.5" height="88.0" width="213.0" data-name="CreateUnverifiedUserDto"></rect>
+<path d="M13386.0 222.5 L13599.0 222.5" fill="none" data-name="CreateUnverifiedUserDto"></path>
+<path d="M13386.0 270.5 L13599.0 270.5" fill="none" data-name="CreateUnverifiedUserDto"></path>
+</g>
+<g transform="translate(13386, 190.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="CreateUnverifiedUserDto" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CreateUnverifiedUserDto" data-compartment="0">
+<a id="src/users/dto/create-unverified-user.dto.ts.CreateUnverifiedUserDto" xlink:href="src/users/dto/create-unverified-user.dto.ts"><text x="98.5" y="14.1" stroke="none" text-anchor="middle" data-name="CreateUnverifiedUserDto" data-compartment="0">CreateUnverifiedUserDto</text></a>
+
+</g>
+</g>
+<g transform="translate(13386, 222.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateUnverifiedUserDto" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CreateUnverifiedUserDto" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="CreateUnverifiedUserDto" data-compartment="1">+email: string</text>
+<text x="0.0" y="30.3" stroke="none" data-name="CreateUnverifiedUserDto" data-compartment="1">+userType: any</text>
+
+</g>
+</g>
+<g transform="translate(13386, 270.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CreateUnverifiedUserDto" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CreateUnverifiedUserDto" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="User">
+<g fill="#eee8d5" stroke="#33322E" data-name="User">
+<rect x="13639.0" y="117.5" height="234.0" width="233.0" data-name="User"></rect>
+<path d="M13639.0 149.5 L13872.0 149.5" fill="none" data-name="User"></path>
+<path d="M13639.0 343.5 L13872.0 343.5" fill="none" data-name="User"></path>
+</g>
+<g transform="translate(13639, 117.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="User" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="User" data-compartment="0">
+<a id="src/users/type/user.type.ts.User" xlink:href="src/users/type/user.type.ts"><text x="108.5" y="14.1" stroke="none" text-anchor="middle" data-name="User" data-compartment="0">User</text></a>
+
+</g>
+</g>
+<g transform="translate(13639, 149.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="User" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="User" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="User" data-compartment="1">+id: number</text>
+<text x="0.0" y="30.3" stroke="none" data-name="User" data-compartment="1">+username: string</text>
+<text x="0.0" y="46.5" stroke="none" data-name="User" data-compartment="1">+email: string</text>
+<text x="0.0" y="62.7" stroke="none" data-name="User" data-compartment="1">+email_is_verified: boolean</text>
+<text x="0.0" y="78.9" stroke="none" data-name="User" data-compartment="1">+hashed_password: string</text>
+<text x="0.0" y="95.1" stroke="none" data-name="User" data-compartment="1">+user_type: UserType</text>
+<text x="0.0" y="111.3" stroke="none" data-name="User" data-compartment="1">+report: Report[]</text>
+<text x="0.0" y="127.5" stroke="none" data-name="User" data-compartment="1">+assigned_report: Report[]</text>
+<text x="0.0" y="143.7" stroke="none" data-name="User" data-compartment="1">+role: UserRoles</text>
+<text x="0.0" y="159.9" stroke="none" data-name="User" data-compartment="1">+skills: Category[]</text>
+<text x="0.0" y="176.1" stroke="none" data-name="User" data-compartment="1">+created_at: Date</text>
+
+</g>
+</g>
+<g transform="translate(13639, 343.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="User" data-compartment="2">
+<g transform="translate(8, 8)" fill="#33322E" data-name="User" data-compartment="2">
+
+</g>
+</g>
+</g>
+<g data-name="UserRoles">
+<g fill="lightgreen" stroke="#33322E" data-name="UserRoles">
+<rect x="13912.0" y="186.0" height="97.0" width="118.0" data-name="UserRoles"></rect>
+<path d="M13912.0 218.0 L14030.0 218.0" fill="none" data-name="UserRoles"></path>
+</g>
+<g transform="translate(13912, 186)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UserRoles" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="UserRoles" data-compartment="0">
+<a id="src/users/entity/user.entity.ts.UserRoles" xlink:href="src/users/entity/user.entity.ts"><text x="51.0" y="14.1" stroke="none" text-anchor="middle" data-name="UserRoles" data-compartment="0">UserRoles</text></a>
+
+</g>
+</g>
+<g transform="translate(13912, 218)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UserRoles" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="UserRoles" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="UserRoles" data-compartment="1">USER</text>
+<text x="0.0" y="30.3" stroke="none" data-name="UserRoles" data-compartment="1">ADMIN</text>
+<text x="0.0" y="46.5" stroke="none" data-name="UserRoles" data-compartment="1">TECHNICIAN</text>
+
+</g>
+</g>
+</g>
+<g data-name="UserType">
+<g fill="lightgreen" stroke="#33322E" data-name="UserType">
+<rect x="14070.0" y="194.5" height="80.0" width="118.0" data-name="UserType"></rect>
+<path d="M14070.0 226.5 L14188.0 226.5" fill="none" data-name="UserType"></path>
+</g>
+<g transform="translate(14070, 194.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UserType" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="UserType" data-compartment="0">
+<a id="src/users/entity/user.entity.ts.UserType" xlink:href="src/users/entity/user.entity.ts"><text x="51.0" y="14.1" stroke="none" text-anchor="middle" data-name="UserType" data-compartment="0">UserType</text></a>
+
+</g>
+</g>
+<g transform="translate(14070, 226.5)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UserType" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="UserType" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="UserType" data-compartment="1">MAHASISWA</text>
+<text x="0.0" y="30.3" stroke="none" data-name="UserType" data-compartment="1">STAFF</text>
+
+</g>
+</g>
+</g>
+<g data-name="ReportStatus">
+<g fill="lightgreen" stroke="#33322E" data-name="ReportStatus">
+<rect x="14228.0" y="162.0" height="145.0" width="248.0" data-name="ReportStatus"></rect>
+<path d="M14228.0 194.0 L14476.0 194.0" fill="none" data-name="ReportStatus"></path>
+</g>
+<g transform="translate(14228, 162)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReportStatus" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ReportStatus" data-compartment="0">
+<a id="src/reports/entity/enum/report-status.enum.ts.ReportStatus" xlink:href="src/reports/entity/enum/report-status.enum.ts"><text x="116.0" y="14.1" stroke="none" text-anchor="middle" data-name="ReportStatus" data-compartment="0">ReportStatus</text></a>
+
+</g>
+</g>
+<g transform="translate(14228, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReportStatus" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ReportStatus" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="ReportStatus" data-compartment="1">PENDING</text>
+<text x="0.0" y="30.3" stroke="none" data-name="ReportStatus" data-compartment="1">PROGRESS</text>
+<text x="0.0" y="46.5" stroke="none" data-name="ReportStatus" data-compartment="1">DONE</text>
+<text x="0.0" y="62.7" stroke="none" data-name="ReportStatus" data-compartment="1">REJECTED</text>
+<text x="0.0" y="78.9" stroke="none" data-name="ReportStatus" data-compartment="1">REJECTED_BY_TECHNICIAN</text>
+<text x="0.0" y="95.1" stroke="none" data-name="ReportStatus" data-compartment="1">WITHDRAWN</text>
+
+</g>
+</g>
+</g>
+<g data-name="SlaStatus">
+<g fill="lightgreen" stroke="#33322E" data-name="SlaStatus">
+<rect x="14516.0" y="186.0" height="97.0" width="151.0" data-name="SlaStatus"></rect>
+<path d="M14516.0 218.0 L14667.0 218.0" fill="none" data-name="SlaStatus"></path>
+</g>
+<g transform="translate(14516, 186)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="SlaStatus" data-compartment="0">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="SlaStatus" data-compartment="0">
+<a id="src/reports/entity/enum/sla-status.enum.ts.SlaStatus" xlink:href="src/reports/entity/enum/sla-status.enum.ts"><text x="67.5" y="14.1" stroke="none" text-anchor="middle" data-name="SlaStatus" data-compartment="0">SlaStatus</text></a>
+
+</g>
+</g>
+<g transform="translate(14516, 218)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="SlaStatus" data-compartment="1">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="SlaStatus" data-compartment="1">
+<text x="0.0" y="14.1" stroke="none" data-name="SlaStatus" data-compartment="1">ON_TIME</text>
+<text x="0.0" y="30.3" stroke="none" data-name="SlaStatus" data-compartment="1">POSSIBLY_LATE</text>
+<text x="0.0" y="46.5" stroke="none" data-name="SlaStatus" data-compartment="1">LATE</text>
+
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>
