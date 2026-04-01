@@ -10,9 +10,12 @@ import { randomUUID } from 'crypto';
 import { Building } from 'src/locations/entity/building.entity';
 import { Location } from 'src/locations/entity/location.entity';
 import { BuildingsService } from 'src/locations/buildings/buildings.service';
+import { getFilteredDto } from './helpers/getFilteredDto';
 import { LocationsService } from 'src/locations/locations.service';
 import { CreateLocationDto } from 'src/locations/dto/create-location.dto';
+import { ForbiddenException } from '@nestjs/common';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { UpdateReportV2Dto } from './dto/update-report-v2.dto';
 import { UserRoles } from 'src/users/entity/user.entity';
 import { User } from 'src/users/type/user.type';
 import { UsersService } from 'src/users/users.service';
@@ -88,11 +91,7 @@ export class ReportsService {
     }
 
     async updateReport(dto: UpdateReportDto, user: User, file: Express.Multer.File){
-        // const { categoryId, buildingId, room, detail, description } = dto
 
-        // if (user.role === UserRole.ADMIN){
-            
-        // }
         console.log('report update masuk')
         //cek apakah report exist
         const report = await this.findReport(dto.reportId)
@@ -201,6 +200,91 @@ export class ReportsService {
         return {
             message: "Report updated",
             report: updatedReport
+        }
+
+    }
+
+    async updateReportV2(file: Express.Multer.File, dto: UpdateReportV2Dto, user: User){
+
+        //cek laporan dan kepemilikannya
+        const report = await this.findReport(dto.id)
+        if (!report) throw new BadRequestException('Report not found')
+        const isOwner = user.id === report.user.id
+        const isPrivileged = [UserRoles.ADMIN, UserRoles.TECHNICIAN].includes(user.role)
+        if(!isOwner && !isPrivileged) throw new ForbiddenException('Report is not yours')
+
+        //filter dto
+        const {filteredDto, errors} = getFilteredDto(dto, user.role)
+        if(errors.length > 0) throw new BadRequestException(`Can't update certain field: ${errors}`) 
+
+        //upload file ke r2
+        if(file){
+            if(user.role !== UserRoles.USER) throw new BadRequestException(`You aren't allowed to change user image`)
+            const format = file.mimetype === "image/jpeg" ? '.jpeg' : '.png'
+            console.log('file di upload dengan format: ', format)
+            const key = "reports/" + randomUUID() + format
+            try {
+                await this.r2.send(new PutObjectCommand({
+                    Bucket: "lapor-sarpras-bucket",
+                    Key: key,
+                    Body: file.buffer,
+                     ContentType: file.mimetype
+                }))
+                report.imgUrl = key
+            } catch (error) {
+                console.log(error)
+                throw new BadRequestException('failed uploading your file')
+            }
+            
+        }
+
+        //cek apakah options ada
+        let category 
+        let building 
+        let assignedTechnician 
+        let priority 
+
+        if (filteredDto.categoryId) {
+            category = await this.categoriesService.findCategoryById(filteredDto.categoryId)
+            if (!category) throw new NotFoundException('Category not found')
+            report.category = category
+        }
+
+        if (filteredDto.buildingId) {
+            building = await this.buildingService.findOneById(filteredDto.buildingId)
+            if (!building) throw new NotFoundException('Building not found')
+        }
+
+        if (filteredDto.assignedTechnicianId) {
+            assignedTechnician = await this.usersService.findOneTechnicianById(Number(filteredDto.assignedTechnicianId))
+            if (!assignedTechnician) throw new NotFoundException('Technician not found')
+            report.assignedTechnician = assignedTechnician
+        }
+
+        if (filteredDto.priority) {
+            priority = await this.priorityService.findPriorityById(Number(filteredDto.priority))
+            if (!priority) throw new NotFoundException('Priority not found')
+            report.priority = priority
+        }
+        
+        //apply perubahan ke report
+        const { categoryId, location, ...rest } = filteredDto
+        const updatedReport = {
+            ...(category && { category }),
+            ...(assignedTechnician && { assignedTechnician }),
+            ...(priority && { priority }),
+            ...rest
+        }
+
+        if (filteredDto.location) {
+            Object.assign(report.location, { building, ...filteredDto.location })
+        }
+
+        Object.assign(report, updatedReport)
+        const newReport = await this.reportRepository.save(report)
+        return {
+            message: "Report updated",
+            report: newReport
         }
 
     }
@@ -373,7 +457,7 @@ export class ReportsService {
     }
 
     async deleteReport(id: number, currentUser: User){
-        console.log('mencoba hapus report')
+        console.log('mencoba hapus report', id, 'current user: ', currentUser)
         const report = await this.reportRepository.findOne({
             where: {
                 id: id,

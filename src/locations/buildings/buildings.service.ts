@@ -21,7 +21,7 @@ export class BuildingsService {
         const building = new Building()
         building.name = createBuildingDto.name.toLocaleLowerCase()
         building.floors = createBuildingDto.floors
-        building.isGeneral = createBuildingDto.facultyId ? false : true
+        building.isGeneral = createBuildingDto.facultyId === 3 ? true : createBuildingDto.isGeneral ? createBuildingDto.isGeneral : false
         console.log(createBuildingDto.facultyId)
 
         if(!building.isGeneral){

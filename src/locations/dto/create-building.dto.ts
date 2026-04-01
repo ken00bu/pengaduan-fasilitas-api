@@ -11,4 +11,8 @@ export class CreateBuildingDto {
     @IsOptional()
     facultyId: number
 
+    @IsBoolean()
+    @IsOptional()
+    isGeneral: boolean
+
 }

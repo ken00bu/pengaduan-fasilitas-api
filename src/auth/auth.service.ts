@@ -34,15 +34,9 @@ export class AuthService {
             await this.usersService.createUnverifiedUser({email, userType })
         } 
 
-        //send email which is aku masih belum yakin gimana alurnya
-        //jadi user punya token yang simpan informasi, misal ada { password_set: password, userEmail: email }
-        //token akan dikirim ke user lewat email,
-        //terus user request lagi ke server buat memverifikasi, server update password dan isVerified dari email yanga ada di token
-        
         try {
             await this.sendEmailVerificationLink(email, await this.createTokenLink({ email, password, username }))
         } catch (error) {
-            console.log('email failed to send: ', error)
             throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR)
         }
 

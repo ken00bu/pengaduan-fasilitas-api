@@ -8,6 +8,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { UpdateReportV2Dto } from './dto/update-report-v2.dto';
 import { ParseJsonPipe } from './pipes/parse-json-pipe.pipe';
 import { FindReportDto } from './dto/find-report.dto';
 import { User } from 'src/users/type/user.type';
@@ -22,7 +23,7 @@ export class ReportsController {
 
 
     // Bikin report
-    @Post()
+    @Post('create')
     @UseGuards(AuthGuard)
     @UseInterceptors(FileInterceptor('file'))
     async crateReport(
@@ -34,16 +35,16 @@ export class ReportsController {
         return await this.reportsService.createReport(createReportDto, file, currentUser)
     }
 
-    // Update report
+    //update versi baru 
     @Patch()
     @UseGuards(AuthGuard)
     @UseInterceptors(FileInterceptor('file'))
-    async updateReport(
+    async updateReportV2(
         @UploadedFile() file: Express.Multer.File,
-        @Body('data', ParseJsonPipe) updateReport: any,
-        @CurrentUser() currentUser: User
+        @Body() updateReportV2: UpdateReportV2Dto,
+        @CurrentUser() CurrentUser: User
     ){
-        return await this.reportsService.updateReport(updateReport, currentUser, file)
+        return await this.reportsService.updateReportV2(file, updateReportV2, CurrentUser)
     }
 
     // Find report
@@ -56,7 +57,7 @@ export class ReportsController {
     }
 
     // Get statistic
-    @Get('statistic')
+    @Get('statistics')
     @UseGuards(AuthGuard)
     async findStatistic(
         @CurrentUser() currentUser: User
