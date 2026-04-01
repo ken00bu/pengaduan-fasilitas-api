@@ -38,6 +38,10 @@ export class UpdateReportDto {
 
     @IsString()
     @IsOptional()
+    title: string
+
+    @IsString()
+    @IsOptional()
     description: string
 
     @IsString()

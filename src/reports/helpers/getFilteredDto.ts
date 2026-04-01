@@ -8,6 +8,7 @@ const FIELD_PERMISSIONS = {
             room: [UserRoles.USER, UserRoles.ADMIN],
             floor: [UserRoles.USER, UserRoles.ADMIN],
             detail: [UserRoles.USER, UserRoles.ADMIN],
+            title: [UserRoles.USER, UserRoles.ADMIN],
             description: [UserRoles.USER, UserRoles.ADMIN],
             status: [UserRoles.ADMIN, UserRoles.TECHNICIAN],
             slaStatus: [UserRoles.ADMIN, UserRoles.TECHNICIAN],
@@ -26,6 +27,7 @@ export type FilteredReportDto = {
     room?: string
     floor?: string
     detail?: string
+    title?: string
     description?: string
     status?: string
     slaStatus?: string
@@ -45,7 +47,7 @@ export const getFilteredDto = (dto: UpdateReportV2Dto, role: UserRoles) => {
 
     const errors: any = []
     const filteredDto: FilteredReportDto = {}
-    const { id, ...rest } = dto
+    const { id, file, ...rest } = dto
 
     for (const [field, value] of Object.entries(rest)){
         const allowedRoles = FIELD_PERMISSIONS[field]

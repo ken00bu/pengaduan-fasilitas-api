@@ -5,6 +5,7 @@ import { User } from "src/users/entity/user.entity";
 import { ReportStatus } from "./enum/report-status.enum";
 import { SlaStatus } from "./enum/sla-status.enum";
 import { Priority } from "src/priority/entity/priority.entity";
+import { MaxLength, MinLength } from "class-validator";
 
 
 @Entity('reports')
@@ -29,7 +30,14 @@ export class Report{
     @JoinColumn()
     location: Location //relasi LOCATION cascade TRUE (sebelum report harus ada location dulu) DONE I HOPE
 
+    @Column({nullable: false})
+    @MaxLength(60)
+    @MinLength(20)
+    title: string
+
     @Column({nullable: true})
+    @MinLength(20)
+    @MaxLength(1000)
     description: string
     
     @Column({nullable: true})

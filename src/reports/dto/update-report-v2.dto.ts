@@ -6,11 +6,13 @@ export class UpdateReportV2Dto {
     @IsNotEmpty()
     id: number
 
+    @IsOptional()
+    file: any
+
     @IsNumberString()
     @IsOptional()
     @IsNotEmpty()
     categoryId: number
-
 
     //location
     @IsNumberString()
@@ -30,6 +32,10 @@ export class UpdateReportV2Dto {
     @IsString()
     @IsOptional()
     detail: string
+
+    @IsString()
+    @IsOptional()
+    title: string
 
     @IsString()
     @IsOptional()

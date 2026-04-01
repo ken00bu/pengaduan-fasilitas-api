@@ -70,6 +70,7 @@ export class ReportsService {
         const reportSla = new Date(Date.now() + category.priority.slaHours * 60 * 60 * 1000);
 
         const report: Report = new Report()
+        report.title = createReportDto.title
         report.priority = category.priority
         report.user = { id: currentUser.id } as any
         report.description = createReportDto.description
@@ -401,7 +402,8 @@ export class ReportsService {
             query.skip(skip).take(limit);
         }
 
-        const reports = await query.getMany();
+
+        const reports = await query.orderBy('reports.createdAt', 'DESC').getMany();
 
         if (dto?.id && !reports.length) {
             throw new NotFoundException('Report not found or not accessible');

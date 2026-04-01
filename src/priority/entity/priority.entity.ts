@@ -15,6 +15,7 @@ export class Priority{
     @Column()
     slaHours: number
 
+    @Column()
     weight: number
 
     @OneToMany(()=>Category, (category)=>category.priority)
