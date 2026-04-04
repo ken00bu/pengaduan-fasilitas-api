@@ -1,4 +1,5 @@
-import { IsNumber, IsString, Min, Max, ValidateNested, IsNotEmpty, IsNumberString, IsObject, isString, IsOptional } from "class-validator";
+import { IsNumber, IsString, Min, Max, ValidateNested, IsNotEmpty, IsNumberString, IsObject, isString, IsOptional, IsEnum } from "class-validator";
+import { ReportStatus } from "../entity/enum/report-status.enum";
 
 export class UpdateReportV2Dto {
 
@@ -42,7 +43,7 @@ export class UpdateReportV2Dto {
     description: string
 
 
-    @IsString()
+    @IsEnum(ReportStatus)
     @IsOptional()
     status: string
 

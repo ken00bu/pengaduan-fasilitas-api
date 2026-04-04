@@ -2,10 +2,10 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Repository, O
 import { Report } from "src/reports/entity/report.entity";
 import { Aspiration } from "src/aspirations/entity/aspiration.entity";
 import { Priority } from "src/priority/entity/priority.entity";
-import { Skill } from "src/skills/entity/skill.entity";
+import { Category } from "src/categories/entity/category.entity";
 
-@Entity('categories')
-export class Category {
+@Entity('skills')
+export class Skill {
     
     @PrimaryGeneratedColumn()
     id: number;
@@ -18,18 +18,9 @@ export class Category {
     })
     isSystem: boolean;
 
-    @ManyToOne(()=>Priority, (priority)=>priority.category)
-    priority: Priority
-
-    @ManyToOne(()=>Skill, (skill)=>skill.category)
-    skill: Skill
+    @OneToMany(()=>Category, (categories)=>categories.skill)
+    category: Category[]
     
-    @OneToMany(()=> Report, (report)=> report.category)
-    report: Report[];
-
-    @OneToMany(()=>Aspiration, (aspiration)=>aspiration.category)
-    aspiration: Aspiration
-
     @CreateDateColumn()
     createdAt: Date;
     

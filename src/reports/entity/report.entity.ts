@@ -35,7 +35,7 @@ export class Report{
     @MinLength(20)
     title: string
 
-    @Column({nullable: true})
+    @Column({type: 'text', nullable: true})
     @MinLength(20)
     @MaxLength(1000)
     description: string

@@ -21,6 +21,8 @@ import { Faculty } from './locations/entity/faculty.entity';
 import { AspirationsModule } from './aspirations/aspirations.module';
 import { Aspiration } from './aspirations/entity/aspiration.entity';
 import { Priority } from './priority/entity/priority.entity';
+import { SkillsModule } from './skills/skills.module';
+import { Skill } from './skills/entity/skill.entity';
 
 @Module({
   imports: [
@@ -38,7 +40,7 @@ import { Priority } from './priority/entity/priority.entity';
         username: 'root',
         password: configService.get<string>('DB_PASS'),
         database: configService.get<string>('DB_USE'),
-        entities: [User, Category, Report, Building, Location, Faculty, Aspiration, Priority],
+        entities: [User, Category, Report, Building, Location, Faculty, Aspiration, Priority, Skill],
         synchronize: true
       })
     }),
@@ -47,6 +49,7 @@ import { Priority } from './priority/entity/priority.entity';
     AspirationsModule,
     R2Module,
     PriorityModule,
+    SkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

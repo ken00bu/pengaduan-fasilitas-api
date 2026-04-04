@@ -315,6 +315,7 @@ export class ReportsService {
 
         const baseSelect = [
             'reports.id',
+            'reports.title',
             'reports.user',
             'reports.slaDate',
             'reports.description',
@@ -343,6 +344,7 @@ export class ReportsService {
                 'user.id',
                 'user.username',
                 'user.email',
+                'priority.weight',
                 'technician.id',
                 'technician.username',
                 'technician.email'
@@ -402,8 +404,7 @@ export class ReportsService {
             query.skip(skip).take(limit);
         }
 
-
-        const reports = await query.orderBy('reports.createdAt', 'DESC').getMany();
+        const reports = await query.orderBy(user.role === UserRoles.ADMIN || user.role === UserRoles.TECHNICIAN ? 'priority.weight' : 'reports.createdAt', 'DESC').getMany();
 
         if (dto?.id && !reports.length) {
             throw new NotFoundException('Report not found or not accessible');
@@ -415,32 +416,32 @@ export class ReportsService {
     async findStatistic(currentUser: User){
         const user = await this.usersService.findUserByEmail(currentUser.email)
         if(!user) throw new BadRequestException('User not exist')
-        
+        const isAdmin = currentUser.role === UserRoles.ADMIN ? true : false
         
         const pendingCount = await this.reportRepository.count({
             where: {
-                user: {id: user.id},
+                ...isAdmin ? undefined : { user: {id: user.id} },
                 status: ReportStatus.PENDING
             }
         })
 
         const progressCount = await this.reportRepository.count({
             where: {
-                user: {id: user.id},
+                ...isAdmin ? undefined : { user: {id: user.id} },
                 status: ReportStatus.PROGRESS
             }
         })
 
         const doneCount = await this.reportRepository.count({
             where: {
-                user: {id: user.id},
+                ...isAdmin ? undefined : { user: {id: user.id} },
                 status: ReportStatus.DONE
             }
         })
 
         const rejectedCount = await this.reportRepository.count({
             where: {
-                user: {id: user.id},
+                ...isAdmin ? undefined : { user: {id: user.id} },
                 status: ReportStatus.REJECTED
             },
         })
