@@ -17,7 +17,7 @@ export class Report{
     @ManyToOne(()=> User, (user)=> user.report)
     user: User //relasi USER DONE
 
-    @ManyToOne(()=> User, (user)=> user.assigned_report, {nullable: true})
+    @ManyToOne(()=> User, (user)=> user.assigned_reports, {nullable: true})
     assignedTechnician: User //relasi USER YANG TECHNITIAN DONE
     
     @ManyToOne(()=> Category, (category)=> category.report)

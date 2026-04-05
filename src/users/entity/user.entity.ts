@@ -1,6 +1,7 @@
 import { Report } from "src/reports/entity/report.entity";
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany, ManyToMany, JoinTable } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany, ManyToMany, JoinTable, OneToOne, ManyToOne } from "typeorm";
 import { Category } from "src/categories/entity/category.entity";
+import { Skill } from "src/skills/entity/skill.entity";
 
 export enum UserRoles {
     USER = 'user',
@@ -43,7 +44,7 @@ export class User {
     report: Report[]
 
     @OneToMany(()=>Report, (report)=>report.assignedTechnician)
-    assigned_report: Report[]
+    assigned_reports: Report[]
 
     @Column({
         type: "enum",
@@ -52,9 +53,8 @@ export class User {
     })
     role: UserRoles
 
-    @ManyToMany(()=> Category)
-    @JoinTable()
-    skills: Category[]
+    @ManyToOne(()=>Skill, (skill)=>skill.user)
+    skill: Skill
 
     @CreateDateColumn()
     created_at: Date

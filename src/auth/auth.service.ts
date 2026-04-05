@@ -1,4 +1,4 @@
-import { HttpCode, Inject } from '@nestjs/common';
+import { forwardRef, HttpCode, Inject } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
@@ -11,6 +11,7 @@ import { LoginDto } from './dto/login.dto';
 export class AuthService {
 
     constructor(
+        @Inject(forwardRef(()=>UsersService))
         private usersService: UsersService,
         @Inject('NODEMAILER')
         private transporter: Transporter,

@@ -1,8 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Repository, OneToMany, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Repository, OneToMany, ManyToOne, OneToOne } from "typeorm";
 import { Report } from "src/reports/entity/report.entity";
 import { Aspiration } from "src/aspirations/entity/aspiration.entity";
 import { Priority } from "src/priority/entity/priority.entity";
 import { Category } from "src/categories/entity/category.entity";
+import { User } from "src/users/entity/user.entity";
 
 @Entity('skills')
 export class Skill {
@@ -20,6 +21,9 @@ export class Skill {
 
     @OneToMany(()=>Category, (categories)=>categories.skill)
     category: Category[]
+
+    @OneToMany(()=>User, (user)=>user.skill)
+    user: User
     
     @CreateDateColumn()
     createdAt: Date;
