@@ -7,6 +7,7 @@ import { CreateUnverifiedUserDto } from './dto/create-unverified-user.dto';
 import { createTransport } from 'nodemailer'
 import { UserRoles } from './entity/user.entity';
 import { FindTechniciansDto } from './dto/find-technicians.dto';
+import { GetTechniciansSummaryDto } from './dto/get-technicians-summary.dto';
 
 @Injectable()
 export class UsersService {
@@ -65,7 +66,7 @@ export class UsersService {
     }
 
     async findManyTechnicians(dto: FindTechniciansDto, currentUser: CurrentUser){
-        const query = this.userRepository.createQueryBuilder('users')
+        const query = await this.userRepository.createQueryBuilder('users')
             .leftJoin('users.skill', 'skill')
             .leftJoin('users.assigned_reports', 'reports')
             .leftJoin('reports.priority', 'priority')
@@ -88,7 +89,7 @@ export class UsersService {
             query.andWhere('users.username LIKE :name', {name: `%${dto.name}%`})
         }
 
-        if(dto.skill){
+        if(dto.skill && dto.skill !== 'all'){
             query.andWhere('skill.name LIKE :skill', {skill: `%${dto.skill}%`})
         }
         
@@ -129,6 +130,40 @@ export class UsersService {
 
         return technicians
             
+    }
+
+    // get technicians statistic
+    async getTechnicianSummary(dto: GetTechniciansSummaryDto){
+        
+        const query = await this.userRepository.createQueryBuilder('users')
+        query.leftJoin('users.skill', 'skill')
+        query.andWhere('users.role = :role', { role: UserRoles.TECHNICIAN })
+        query.select("COUNT(*)", "total")
+        query.addSelect("skill.name", "skill")
+        query.groupBy('skill.name')
+
+        if(dto.skill){
+            query.andWhere('skill.name = :skill', { skill: dto.skill })
+        }
+        
+        const raw = await query.getRawMany();
+
+        const count = {};
+
+        for (const item of raw) {
+            count[item.skill.toLowerCase()] = Number(item.total);
+        }
+
+        const total = await this.userRepository.count({
+        where: {
+            role: UserRoles.TECHNICIAN
+        }
+        });
+
+        return {
+            total,
+            count
+        }
     }
 
 }

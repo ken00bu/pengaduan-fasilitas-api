@@ -1,22 +1,26 @@
-import { IsNumber, IsString, Min, Max, ValidateNested, IsNotEmpty, IsNumberString, IsObject, isString, IsOptional, IsEnum } from "class-validator";
+import { IsNumber, IsString, IsNotEmpty, IsOptional, IsEnum } from "class-validator";
+import { Type } from "class-transformer";
 import { ReportStatus } from "../entity/enum/report-status.enum";
 
 export class UpdateReportV2Dto {
 
-    @IsNumberString()
+    @Type(() => Number)
+    @IsNumber()
     @IsNotEmpty()
     id: number
 
     @IsOptional()
     file: any
 
-    @IsNumberString()
+    @Type(() => Number)
+    @IsNumber()
     @IsOptional()
     @IsNotEmpty()
     categoryId: number
 
     //location
-    @IsNumberString()
+    @Type(() => Number)
+    @IsNumber()
     @IsOptional()
     @IsNotEmpty()
     buildingId: number
@@ -25,10 +29,11 @@ export class UpdateReportV2Dto {
     @IsOptional()
     room: string
 
-    @IsNumberString()
+    @Type(() => Number)
+    @IsNumber()
     @IsOptional()
     @IsNotEmpty()
-    floor: string
+    floor: number
 
     @IsString()
     @IsOptional()
@@ -45,14 +50,16 @@ export class UpdateReportV2Dto {
 
     @IsEnum(ReportStatus)
     @IsOptional()
-    status: string
+    status: ReportStatus
 
     @IsString()
     @IsOptional()
     slaStatus: string
     
     @IsOptional()
-    assignedTechnicianId: string
+    @Type(() => Number)
+    @IsNumber()
+    assignedTechnicianId: number
 
     @IsOptional()
     adminNote: string
