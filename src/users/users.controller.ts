@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Param } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
 import { User } from './type/user.type';

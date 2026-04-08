@@ -46,6 +46,9 @@ export class User {
     @OneToMany(()=>Report, (report)=>report.assignedTechnician)
     assigned_reports: Report[]
 
+    @Column({nullable: true})
+    phone_number: number;
+
     @Column({
         type: "enum",
         enum: UserRoles,

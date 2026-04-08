@@ -16,7 +16,6 @@ export class FindTechniciansDto {
         @Min(3)
         limit: number
 
-        @IsNumberString()
         @Type(()=> Number)
         @IsOptional()
         id: number

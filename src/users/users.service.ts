@@ -73,6 +73,7 @@ export class UsersService {
 
         const baseSelect = [
             'users.id',
+            'users.phone_number',
             'users.username',
             'skill.id',
             'skill.name',
@@ -83,6 +84,7 @@ export class UsersService {
 
         if(dto.id){
             query.andWhere('users.id = :id', { id:dto.id })
+            query.addSelect(['users.email', 'users.created_at'])
         }
 
         if(dto.name){
@@ -165,5 +167,6 @@ export class UsersService {
             count
         }
     }
+
 
 }
