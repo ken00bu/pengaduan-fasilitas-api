@@ -407,9 +407,11 @@ export class ReportsService {
         }
 
         if(dto?.like){
-            query.andWhere('reports.title LIKE :like', { like: `%${dto.like}%` })
+            console.log('mencari dengan like: ', dto.like)
+            query.andWhere('(reports.title LIKE :like OR reports.ticket LIKE :like OR user.username LIKE :like OR category.name LIKE :like OR priority.name LIKE :like)', { like: `%${dto.like}%` })
         }
 
+        const total = await query.getCount();
 
         if (dto?.page && dto?.limit) {
             const limit = Number(dto.limit);
@@ -423,7 +425,10 @@ export class ReportsService {
             throw new NotFoundException('Report not found or not accessible');
         }
 
-        return reports;
+        return {
+            total,
+            reports
+        }
     }
 
     async findStatistic(currentUser: User){

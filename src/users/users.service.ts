@@ -94,7 +94,7 @@ export class UsersService {
         })
     }
 
-    async findManyTechnicians(dto: FindTechniciansDto, currentUser: CurrentUser): Promise<Record<string, any>[]>{
+    async findManyTechnicians(dto: FindTechniciansDto, currentUser: CurrentUser): Promise<Record<string, any>>{
         const query = await this.userRepository.createQueryBuilder('users')
             .leftJoin('users.skill', 'skill')
             .leftJoin('users.assigned_reports', 'reports')
@@ -158,6 +158,8 @@ export class UsersService {
         if(dto.skill && dto.skill !== 'all'){
             query.andWhere('skill.name LIKE :skill', {skill: `%${dto.skill}%`})
         }
+
+        const total = await query.getCount()
         
         if(dto.orderBy === 'weight'){
             query.addSelect('SUM(priority.weight)', 'totalWeight')
@@ -180,7 +182,10 @@ export class UsersService {
             }))
 
             if(!result.length) throw new NotFoundException('Technicians not found')
-            return result
+            return {
+                total,
+                technicians: result
+        }
         }
 
 
@@ -202,7 +207,10 @@ export class UsersService {
             throw new NotFoundException('Technicians not found')
         }
 
-        return result
+        return {
+            total,
+            technicians: result
+        }
     }
 
     // get technicians statistic
