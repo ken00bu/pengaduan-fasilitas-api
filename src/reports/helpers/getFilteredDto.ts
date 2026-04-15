@@ -13,7 +13,9 @@ const FIELD_PERMISSIONS = {
             status: [UserRoles.ADMIN, UserRoles.TECHNICIAN],
             slaStatus: [UserRoles.ADMIN, UserRoles.TECHNICIAN],
             assignedTechnicianId: [UserRoles.ADMIN],
+            slaDate: [UserRoles.ADMIN],
             adminNote: [UserRoles.ADMIN],
+            reopenedAt: [UserRoles.ADMIN],
             priority: [UserRoles.ADMIN],
             technicianNote: [UserRoles.TECHNICIAN],
         }
@@ -25,10 +27,12 @@ export type FilteredReportDto = {
     categoryId?: number
     buildingId?: number
     room?: string
+    reopenedAt?: string
     floor?: string
     detail?: string
     title?: string
     description?: string
+    slaDate?: number
     status?: string
     slaStatus?: string
     assignedTechnicianId?: string
@@ -50,6 +54,7 @@ export const getFilteredDto = (dto: UpdateReportV2Dto, role: UserRoles) => {
     const { id, file, ...rest } = dto
 
     for (const [field, value] of Object.entries(rest)){
+        if (value === undefined || value === null || value === '') continue;
         const allowedRoles = FIELD_PERMISSIONS[field]
         if(!allowedRoles || !allowedRoles.includes(role)){
             errors.push(`Role ${role} tidak boleh update field ${field}`);

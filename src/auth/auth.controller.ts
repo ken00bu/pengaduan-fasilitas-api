@@ -12,13 +12,6 @@ export class AuthController {
         private authService: AuthService,
     ){}
 
-    // @Post('/create-user')
-    // async createUser(
-    //     @Body() createUserDto: CreateUserDto
-    // ){
-    //     return await this.userService.createUser(createUserDto)
-    // }
-
     @Post('/register')
     @HttpCode(HttpStatus.CREATED)
     async register( @Body() registerDto: RegisterDto): Promise<Record<string, string>>{

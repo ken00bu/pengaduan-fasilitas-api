@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, Param } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Param, Post, Body } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
 import { User } from './type/user.type';
@@ -8,6 +8,7 @@ import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRoles } from './entity/user.entity';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { GetTechniciansSummaryDto } from './dto/get-technicians-summary.dto';
+import { CreateTechnicianDto } from './dto/create-technician.dto';
 
 @Controller('users')
 export class UsersController {
@@ -35,4 +36,12 @@ export class UsersController {
         return await this.usersService.getTechnicianSummary(dto)
     }
 
+    @Post('technicians')
+    @Roles([UserRoles.ADMIN])
+    @UseGuards(AuthGuard, RolesGuard)
+    async createTechnician(
+        @Body() dto: CreateTechnicianDto
+    ){
+        return await this.usersService.createTechnician(dto) 
+    }
 }

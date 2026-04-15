@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsNotEmpty, IsOptional, IsEnum } from "class-validator";
+import { IsNumber, IsString, IsNotEmpty, IsOptional, IsEnum, IsDate } from "class-validator";
 import { Type } from "class-transformer";
 import { ReportStatus } from "../entity/enum/report-status.enum";
 
@@ -55,7 +55,12 @@ export class UpdateReportV2Dto {
     @IsString()
     @IsOptional()
     slaStatus: string
-    
+
+    @Type(()=> Date)
+    @IsDate()
+    @IsOptional()
+    slaDate: Date
+
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
@@ -66,6 +71,9 @@ export class UpdateReportV2Dto {
 
     @IsOptional()
     priority: string
+
+    @IsOptional()
+    reopenedAt: Date
 
     @IsOptional()
     technicianNote: string

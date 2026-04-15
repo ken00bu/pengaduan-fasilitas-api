@@ -1,5 +1,5 @@
-import { IsNumber, IsString, Min, Max, ValidateNested, IsNotEmpty, IsNumberString, IsObject, IsOptional, ValidateIf, IsEnum } from "class-validator";
-import { Type } from "class-transformer";
+import { IsNumber, IsString, Min, Max, ValidateNested, IsNotEmpty, IsNumberString, IsObject, IsOptional, ValidateIf, IsEnum, IsBoolean } from "class-validator";
+import { Type, Transform } from "class-transformer";
 
 export class FindTechniciansDto {
 
@@ -23,6 +23,15 @@ export class FindTechniciansDto {
         @IsString()
         @IsOptional()
         skill: string
+
+        @Transform(({value})=> {
+                if (value === 'true') return true
+                if (value === 'false') return false
+                return value
+        })
+        @IsBoolean()
+        @IsOptional()
+        isAssigned: boolean
 
         @IsString()
         @IsOptional()

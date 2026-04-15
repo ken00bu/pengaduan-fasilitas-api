@@ -12,6 +12,14 @@ export class FindReportDto {
 
     @IsString()
     @IsOptional()
+    ticket: string
+
+    @IsString()
+    @IsOptional()
+    like: string
+
+    @IsString()
+    @IsOptional()
     building: string
 
     @IsString()

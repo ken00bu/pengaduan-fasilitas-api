@@ -14,6 +14,9 @@ export class Report{
     @PrimaryGeneratedColumn()
     id: number
 
+    @Column({unique: true})
+    ticket: string
+
     @ManyToOne(()=> User, (user)=> user.report)
     user: User //relasi USER DONE
 
@@ -60,5 +63,8 @@ export class Report{
 
     @CreateDateColumn()
     createdAt: Date;
+
+    @Column({nullable: true})
+    reopenedAt: Date;
 
 }

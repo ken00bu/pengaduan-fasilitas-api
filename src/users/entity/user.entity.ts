@@ -9,7 +9,7 @@ export enum UserRoles {
     TECHNICIAN = 'technician'
 }
 
-enum UserType {
+export enum UserType {
     MAHASISWA = 'mahasiswa',
     STAFF = 'staff'
 }

@@ -1,6 +1,6 @@
 import { BadRequestException, NotFoundException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entity/user.entity';
+import { User, UserType } from './entity/user.entity';
 import type { User as CurrentUser } from './type/user.type';
 import { Repository } from 'typeorm';
 import { CreateUnverifiedUserDto } from './dto/create-unverified-user.dto';
@@ -8,13 +8,21 @@ import { createTransport } from 'nodemailer'
 import { UserRoles } from './entity/user.entity';
 import { FindTechniciansDto } from './dto/find-technicians.dto';
 import { GetTechniciansSummaryDto } from './dto/get-technicians-summary.dto';
+import { Report } from 'src/reports/entity/report.entity';
+import { CreateTechnicianDto } from './dto/create-technician.dto';
+import * as bcrypt from 'bcrypt';
+import { Skill } from 'src/skills/entity/skill.entity';
 
 @Injectable()
 export class UsersService {
 
     constructor(
         @InjectRepository(User)
-        private userRepository: Repository<User>
+        private userRepository: Repository<User>,
+        @InjectRepository(Report)
+        private reportRepository: Repository<Report>,
+        @InjectRepository(Skill)
+        private skillRepository: Repository<Skill>
     ){}
 
     // Auth
@@ -56,6 +64,27 @@ export class UsersService {
 
 
     // User Technician
+    async createTechnician(dto: CreateTechnicianDto){
+        const { username, password, email, skillId } = dto
+
+        const skill = await this.skillRepository.findOneBy({ id: skillId })
+        if(!skill) throw new NotFoundException('Skill not found')
+
+        try {
+            return await this.userRepository.save({
+                username,
+                email,
+                skill,
+                hashed_password: await bcrypt.hash(password, await bcrypt.genSalt()),
+                user_type: UserType.STAFF,
+                role: UserRoles.TECHNICIAN
+            })
+        } catch (error) {
+            throw new BadRequestException('Failed to create Technician')
+        }
+    }
+
+
     async findOneTechnicianById(id: number){
         return await this.userRepository.findOne({
             where: {
@@ -65,7 +94,7 @@ export class UsersService {
         })
     }
 
-    async findManyTechnicians(dto: FindTechniciansDto, currentUser: CurrentUser){
+    async findManyTechnicians(dto: FindTechniciansDto, currentUser: CurrentUser): Promise<Record<string, any>[]>{
         const query = await this.userRepository.createQueryBuilder('users')
             .leftJoin('users.skill', 'skill')
             .leftJoin('users.assigned_reports', 'reports')
@@ -80,7 +109,42 @@ export class UsersService {
         ]
 
         query.select(baseSelect)
+        query.addSelect(
+            `SUM(CASE WHEN reports.status = 'done' THEN 1 ELSE 0 END)`,
+            'totalFinished'
+        )
+        query.addSelect(
+            `SUM(CASE WHEN reports.status = 'done' THEN TIMESTAMPDIFF(HOUR, reports.createdAt, reports.slaDate) ELSE 0 END)`,
+            'totalHours'
+        )
+        query.groupBy('users.id')
         query.andWhere('users.role = :role', { role: UserRoles.TECHNICIAN })
+        console.log('dto:', dto)
+        if(dto.isAssigned === true){
+            query.andWhere(qb => {
+                console.log('assigned true')
+                const subQuery = qb.subQuery()
+                    .select('1')
+                    .from('reports', 'r')
+                    .where('r.assignedTechnicianId = users.id')
+                    .andWhere('r.status = :assignedStatus', { assignedStatus: 'progress' })
+                    .getQuery()
+                return `EXISTS ${subQuery}`
+            })
+        }
+
+        if(dto.isAssigned === false){
+            query.andWhere(qb => {
+                console.log('assigned false')
+                const subQuery = qb.subQuery()
+                    .select('1')
+                    .from('reports', 'r')
+                    .where('r.assignedTechnicianId = users.id')
+                    .andWhere('r.status = :assignedStatus', { assignedStatus: 'progress' }) 
+                    .getQuery()
+                return `NOT EXISTS ${subQuery}`
+            })
+        }
 
         if(dto.id){
             query.andWhere('users.id = :id', { id:dto.id })
@@ -110,7 +174,9 @@ export class UsersService {
 
             const result = entities.map((entity, index) => ({
                 ...entity,
-                totalWeight: Number(raw[index]?.totalWeight) ?? 0
+                totalWeight: Number(raw[index]?.totalWeight) ?? 0,
+                totalFinished: Number(raw[index]?.totalFinished) ?? 0,
+                totalHours: Number(raw[index]?.totalHours) ?? 0
             }))
 
             if(!result.length) throw new NotFoundException('Technicians not found')
@@ -124,14 +190,19 @@ export class UsersService {
             query.skip(skip).take(limit);
         }
 
-        const technicians = await query.getMany()
-        console.log(`technicians: ${technicians}`)
-        if(!technicians.length){
+        const { raw, entities } = await query.getRawAndEntities()
+
+        const result = entities.map((entity, index) => ({
+            ...entity,
+            totalFinished: Number(raw[index]?.totalFinished) ?? 0,
+            totalHours: Number(raw[index]?.totalHours) ?? 0
+        }))
+
+        if(!result.length){
             throw new NotFoundException('Technicians not found')
         }
 
-        return technicians
-            
+        return result
     }
 
     // get technicians statistic
@@ -162,9 +233,17 @@ export class UsersService {
         }
         });
 
+        const assignedCount = await this.userRepository.createQueryBuilder('users')
+            .innerJoin('users.assigned_reports', 'reports')
+            .where('users.role = :role', { role: UserRoles.TECHNICIAN })
+            .andWhere('reports.status = :status', { status: 'progress' })
+            .select('COUNT(DISTINCT users.id)', 'total')
+            .getRawOne()
+
         return {
             total,
-            count
+            assigned: Number(assignedCount?.total) ?? 0,
+            skill: count,
         }
     }
 

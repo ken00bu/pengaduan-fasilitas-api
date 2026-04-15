@@ -23,6 +23,7 @@ import { ReportStatus } from './entity/enum/report-status.enum';
 import { SlaStatus } from './entity/enum/sla-status.enum';
 import { FindReportDto } from './dto/find-report.dto';
 import { PriorityService } from 'src/priority/priority.service';
+import { formatTicketId } from 'src/shared/utils/stringFormat';
 
 @Injectable()
 export class ReportsService {
@@ -85,9 +86,13 @@ export class ReportsService {
         report.imgUrl = key || ''
         const savedReport = await this.reportRepository.save(report)
 
+        //generate ticket
+        const ticket = formatTicketId(savedReport.id, savedReport.createdAt)
+        const reportwithupdate = await this.reportRepository.update(savedReport.id, { ticket })
+
         return {
             message: 'Report successfully added',
-            report: savedReport
+            report: reportwithupdate
         }
     }
 
@@ -316,15 +321,19 @@ export class ReportsService {
         const baseSelect = [
             'reports.id',
             'reports.title',
-            'reports.user',
+            'reports.ticket',
+            'user.username',
             'reports.slaDate',
             'reports.description',
             'reports.status',
             'reports.slaStatus',
             'reports.adminNote',
+            'reports.reopenedAt',
             'reports.imgUrl',
             'reports.priority',
             'reports.createdAt',
+            'technician.username',
+            'technician.email',
             'category.id',
             'category.name',
             'location.floor',
@@ -342,20 +351,15 @@ export class ReportsService {
             filteredSelect.push(
                 'reports.technicianNote',
                 'user.id',
-                'user.username',
                 'user.email',
                 'priority.weight',
                 'technician.id',
-                'technician.username',
-                'technician.email'
             );
         }
 
         if (user.role === UserRoles.USER) {
             filteredSelect.push(
-                'user.id',
-                'technician.id',
-                'technician.username'
+
             );
         }
 
@@ -397,6 +401,15 @@ export class ReportsService {
                 query.andWhere('reports.status = :status', { status: dto.status });
             }
         }
+
+        if(dto?.ticket){
+            query.andWhere('reports.ticket = :ticket', { ticket: dto.ticket })
+        }
+
+        if(dto?.like){
+            query.andWhere('reports.title LIKE :like', { like: `%${dto.like}%` })
+        }
+
 
         if (dto?.page && dto?.limit) {
             const limit = Number(dto.limit);
@@ -446,6 +459,15 @@ export class ReportsService {
             },
         })
 
+        let rejectedByTechnicianCount
+        if(isAdmin){
+            rejectedByTechnicianCount = await this.reportRepository.count({
+                where: {
+                    status: ReportStatus.REJECTED_BY_TECHNICIAN
+                }
+            })
+        }
+
 
         return {
             total: pendingCount + progressCount + doneCount + rejectedCount,
@@ -453,7 +475,8 @@ export class ReportsService {
                 pending: pendingCount,
                 progress: progressCount,
                 done: doneCount,
-                rejected: rejectedCount
+                rejected: rejectedCount,
+                ...(isAdmin && { rejectedByTechnician: rejectedByTechnicianCount })
             }
         }
 

@@ -9,7 +9,9 @@ async function bootstrap() {
     origin: "http://localhost:3000",
     credentials: true
   })
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true
+  }))
   app.use(cookieParser())
   await app.listen(process.env.PORT ?? 3001);
 }
