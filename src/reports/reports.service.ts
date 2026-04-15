@@ -406,6 +406,10 @@ export class ReportsService {
             query.andWhere('reports.ticket = :ticket', { ticket: dto.ticket })
         }
 
+        if(dto.slaStatus){
+            query.andWhere('reports.slaStatus = :slaStatus', { slaStatus: dto.slaStatus })
+        }
+
         if(dto?.like){
             console.log('mencari dengan like: ', dto.like)
             query.andWhere('(reports.title LIKE :like OR reports.ticket LIKE :like OR user.username LIKE :like OR category.name LIKE :like OR priority.name LIKE :like)', { like: `%${dto.like}%` })

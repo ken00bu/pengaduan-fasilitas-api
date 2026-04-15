@@ -28,6 +28,10 @@ export class FindReportDto {
 
     @IsString()
     @IsOptional()
+    slaStatus: string
+
+    @IsString()
+    @IsOptional()
     faculty: string
 
     @IsString()

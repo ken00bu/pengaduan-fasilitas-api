@@ -117,6 +117,7 @@ export class UsersService {
             `SUM(CASE WHEN reports.status = 'done' THEN TIMESTAMPDIFF(HOUR, reports.createdAt, reports.slaDate) ELSE 0 END)`,
             'totalHours'
         )
+        
         query.groupBy('users.id')
         query.andWhere('users.role = :role', { role: UserRoles.TECHNICIAN })
         console.log('dto:', dto)
@@ -186,6 +187,10 @@ export class UsersService {
                 total,
                 technicians: result
         }
+        }
+
+        if(dto.like){
+            query.andWhere('(users.username LIKE :like OR skill.name LIKE :like)', { like: `%${dto.like}%` })
         }
 
 

@@ -41,4 +41,8 @@ export class FindTechniciansDto {
         @IsOptional()
         orderBy: string
 
+        @IsString()
+        @IsOptional()
+        like: string
+
 }
