@@ -1,5 +1,5 @@
 import { IsNumber, IsString, Min, Max, ValidateNested, IsNotEmpty, IsNumberString, IsObject, IsOptional, ValidateIf, IsEnum } from "class-validator";
-import { Type } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import { ReportStatus } from "../entity/enum/report-status.enum";
 
 type ReportStatusWithAll = ReportStatus | 'all';
@@ -52,6 +52,15 @@ export class FindReportDto {
 
     @IsEnum(['all', ...Object.values(ReportStatus)], {message: 'invalid status'})
     @IsOptional()
-    status: ReportStatusWithAll  
+    status: ReportStatusWithAll
+    
+    @IsEnum(['createdAt', 'weight'], {message: 'invalid order by'})
+    @IsOptional()
+    orderBy: 'createdAt' | 'weight'
+
+    @IsOptional()
+    @Transform(({ value }) => value?.toUpperCase() || 'DESC')
+    @IsEnum(['DESC', 'ASC'], {message: 'invalid sort order'})
+    sortOrder: 'DESC' | 'ASC'
 
 }

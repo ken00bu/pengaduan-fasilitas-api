@@ -423,7 +423,9 @@ export class ReportsService {
             query.skip(skip).take(limit);
         }
 
-        const reports = await query.orderBy(user.role === UserRoles.ADMIN || user.role === UserRoles.TECHNICIAN ? 'priority.weight' : 'reports.createdAt', 'DESC').getMany();
+        // jika orderBy weighh gunakan weight, selain itu gunakan createdAt
+        // sortOrder default DESC
+        const reports = await query.orderBy( dto.orderBy === 'weight' ? 'priority.weight' : 'reports.createdAt', dto.sortOrder ).getMany();
 
         if (dto?.id && !reports.length) {
             throw new NotFoundException('Report not found or not accessible');

@@ -94,8 +94,8 @@ export class UsersService {
         })
     }
 
-    async findManyTechnicians(dto: FindTechniciansDto, currentUser: CurrentUser): Promise<Record<string, any>>{
-        const query = await this.userRepository.createQueryBuilder('users')
+    async findManyTechnicians(dto: FindTechniciansDto, currentUser: CurrentUser): Promise<Record<string, any>> {
+        const query = this.userRepository.createQueryBuilder('users')
             .leftJoin('users.skill', 'skill')
             .leftJoin('users.assigned_reports', 'reports')
             .leftJoin('reports.priority', 'priority')
@@ -117,13 +117,12 @@ export class UsersService {
             `SUM(CASE WHEN reports.status = 'done' THEN TIMESTAMPDIFF(HOUR, reports.createdAt, reports.slaDate) ELSE 0 END)`,
             'totalHours'
         )
-        
+
         query.groupBy('users.id')
         query.andWhere('users.role = :role', { role: UserRoles.TECHNICIAN })
-        console.log('dto:', dto)
-        if(dto.isAssigned === true){
+
+        if (dto.isAssigned === true) {
             query.andWhere(qb => {
-                console.log('assigned true')
                 const subQuery = qb.subQuery()
                     .select('1')
                     .from('reports', 'r')
@@ -134,70 +133,47 @@ export class UsersService {
             })
         }
 
-        if(dto.isAssigned === false){
+        if (dto.isAssigned === false) {
             query.andWhere(qb => {
-                console.log('assigned false')
                 const subQuery = qb.subQuery()
                     .select('1')
                     .from('reports', 'r')
                     .where('r.assignedTechnicianId = users.id')
-                    .andWhere('r.status = :assignedStatus', { assignedStatus: 'progress' }) 
+                    .andWhere('r.status = :assignedStatus', { assignedStatus: 'progress' })
                     .getQuery()
                 return `NOT EXISTS ${subQuery}`
             })
         }
 
-        if(dto.id){
-            query.andWhere('users.id = :id', { id:dto.id })
+        if (dto.id) {
+            query.andWhere('users.id = :id', { id: dto.id })
             query.addSelect(['users.email', 'users.created_at'])
         }
 
-        if(dto.name){
-            query.andWhere('users.username LIKE :name', {name: `%${dto.name}%`})
+        if (dto.name) {
+            query.andWhere('users.username LIKE :name', { name: `%${dto.name}%` })
         }
 
-        if(dto.skill && dto.skill !== 'all'){
-            query.andWhere('skill.name LIKE :skill', {skill: `%${dto.skill}%`})
+        if (dto.skill && dto.skill !== 'all') {
+            query.andWhere('skill.name LIKE :skill', { skill: `%${dto.skill}%` })
         }
 
-        const total = await query.getCount()
-        
-        if(dto.orderBy === 'weight'){
-            query.addSelect('SUM(priority.weight)', 'totalWeight')
-                .groupBy('users.id')
-                .orderBy('totalWeight', 'ASC')
-
-            if (dto?.page && dto?.limit) {
-                const limit = Number(dto.limit);
-                const skip = (Number(dto.page) - 1) * limit;
-                query.skip(skip).take(limit);
-            }
-
-            const { raw, entities } = await query.getRawAndEntities()
-
-            const result = entities.map((entity, index) => ({
-                ...entity,
-                totalWeight: Number(raw[index]?.totalWeight) ?? 0,
-                totalFinished: Number(raw[index]?.totalFinished) ?? 0,
-                totalHours: Number(raw[index]?.totalHours) ?? 0
-            }))
-
-            if(!result.length) throw new NotFoundException('Technicians not found')
-            return {
-                total,
-                technicians: result
-        }
-        }
-
-        if(dto.like){
+        if (dto.like) {
             query.andWhere('(users.username LIKE :like OR skill.name LIKE :like)', { like: `%${dto.like}%` })
         }
 
+        const total = await query.getCount()
+
+        // Kondisikan orderBy weight tanpa early return
+        if (dto.orderBy === 'weight') {
+            query.addSelect('SUM(priority.weight)', 'totalWeight')
+                .orderBy('totalWeight', 'ASC')
+        }
 
         if (dto?.page && dto?.limit) {
-            const limit = Number(dto.limit);
-            const skip = (Number(dto.page) - 1) * limit;
-            query.skip(skip).take(limit);
+            const limit = Number(dto.limit)
+            const skip = (Number(dto.page) - 1) * limit
+            query.skip(skip).take(limit)
         }
 
         const { raw, entities } = await query.getRawAndEntities()
@@ -205,16 +181,17 @@ export class UsersService {
         const result = entities.map((entity, index) => ({
             ...entity,
             totalFinished: Number(raw[index]?.totalFinished) ?? 0,
-            totalHours: Number(raw[index]?.totalHours) ?? 0
+            totalHours: Number(raw[index]?.totalHours) ?? 0,
+            ...(dto.orderBy === 'weight' && { totalWeight: Number(raw[index]?.totalWeight) ?? 0 }),
         }))
 
-        if(!result.length){
+        if (!result.length) {
             throw new NotFoundException('Technicians not found')
         }
 
         return {
             total,
-            technicians: result
+            technicians: result,
         }
     }
 
