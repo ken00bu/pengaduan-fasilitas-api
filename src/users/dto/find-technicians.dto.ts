@@ -45,4 +45,13 @@ export class FindTechniciansDto {
         @IsOptional()
         like: string
 
+        @Transform(({value})=> {
+                if (value === 'true') return true
+                if (value === 'false') return false
+                return value
+        })
+        @IsOptional()
+        @IsBoolean()
+        filtered: boolean
+
 }

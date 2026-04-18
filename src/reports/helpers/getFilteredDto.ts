@@ -21,6 +21,10 @@ const FIELD_PERMISSIONS = {
         }
 
 const TECHNICIAN_ALLOWED_STATUS = [ReportStatus.REJECTED_BY_TECHNICIAN, ReportStatus.DONE]
+const STATUS_RULE = {
+    [ReportStatus.REJECTED_BY_TECHNICIAN]: [ReportStatus.PROGRESS],
+    [ReportStatus.DONE]: [ReportStatus.PROGRESS]
+}
 const LOCATION = ['buildingId', 'room', 'floor', 'detail']
 
 export type FilteredReportDto = {
@@ -47,7 +51,7 @@ export type FilteredReportDto = {
     }
 }
 
-export const getFilteredDto = (dto: UpdateReportV2Dto, role: UserRoles) => {
+export const getFilteredDto = (dto: UpdateReportV2Dto, role: UserRoles, currentStatus?: ReportStatus) => {
 
     const errors: any = []
     const filteredDto: FilteredReportDto = {}
@@ -64,6 +68,10 @@ export const getFilteredDto = (dto: UpdateReportV2Dto, role: UserRoles) => {
         if(field === 'status' && role === UserRoles.TECHNICIAN){
             if(!TECHNICIAN_ALLOWED_STATUS.includes(value as ReportStatus)){
                 errors.push(`Teknisi tidak boleh set status ke '${value}'`);
+                continue
+            }
+            if(currentStatus && !STATUS_RULE[value as ReportStatus].includes(currentStatus)){
+                errors.push(`Teknisi tidak boleh ubah status dari '${currentStatus}' ke '${value}'`);
                 continue
             }
         }

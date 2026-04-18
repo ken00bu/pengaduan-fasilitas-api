@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors, UsePipes, Get, Query, Delete, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors, UsePipes, Get, Query, Delete, ParseIntPipe, Sse } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from 'src/auth/auth.service';
 import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
@@ -11,7 +11,10 @@ import { UpdateReportDto } from './dto/update-report.dto';
 import { UpdateReportV2Dto } from './dto/update-report-v2.dto';
 import { ParseJsonPipe } from './pipes/parse-json-pipe.pipe';
 import { FindReportDto } from './dto/find-report.dto';
+import { Observable } from 'rxjs';
 import { User } from 'src/users/type/user.type';
+import { UserRoles } from 'src/users/entity/user.entity';
+
 
 @Controller('reports')
 export class ReportsController {
@@ -20,6 +23,14 @@ export class ReportsController {
         private reportsService: ReportsService,
         private authService: AuthService
     ){}
+
+    //sse
+    @Sse('stream')
+    @Roles([UserRoles.ADMIN])
+    @UseGuards(AuthGuard, RolesGuard)
+    stream(): Observable<MessageEvent>{
+        return this.reportsService.getReportsStream()
+    }
 
 
     // Bikin report

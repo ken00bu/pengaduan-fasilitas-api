@@ -1,6 +1,7 @@
 import { IsNumber, IsString, IsNotEmpty, IsOptional, IsEnum, IsDate } from "class-validator";
 import { Type } from "class-transformer";
 import { ReportStatus } from "../entity/enum/report-status.enum";
+import { SlaStatus } from "../entity/enum/sla-status.enum";
 
 export class UpdateReportV2Dto {
 
@@ -52,9 +53,9 @@ export class UpdateReportV2Dto {
     @IsOptional()
     status: ReportStatus
 
-    @IsString()
     @IsOptional()
-    slaStatus: string
+    @IsEnum(SlaStatus)
+    slaStatus: SlaStatus;
 
     @Type(()=> Date)
     @IsDate()

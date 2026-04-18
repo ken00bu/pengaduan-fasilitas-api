@@ -14,7 +14,7 @@ export class Report{
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column({unique: true})
+    @Column({unique: true, default: 'UNSET'})
     ticket: string
 
     @ManyToOne(()=> User, (user)=> user.report)

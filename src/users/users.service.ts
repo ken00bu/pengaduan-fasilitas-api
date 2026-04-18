@@ -162,6 +162,18 @@ export class UsersService {
             query.andWhere('(users.username LIKE :like OR skill.name LIKE :like)', { like: `%${dto.like}%` })
         }
 
+        if(dto.filtered){
+            query.andWhere(qb => {
+                const subQuery = qb.subQuery()
+                    .select('COUNT(r.id)')
+                    .from('reports', 'r')
+                    .where('r.assignedTechnicianId = users.id')
+                    .andWhere('r.status = :filteredStatus', { filteredStatus: 'progress' })
+                    .getQuery()
+                return `(${subQuery}) < 8`
+            })
+        }
+        
         const total = await query.getCount()
 
         // Kondisikan orderBy weight tanpa early return
@@ -212,9 +224,9 @@ export class UsersService {
         const raw = await query.getRawMany();
 
         const count = {};
-
+        console.log(raw)
         for (const item of raw) {
-            count[item.skill.toLowerCase()] = Number(item.total);
+            count[item.skill?.toLowerCase()] = Number(item.total);
         }
 
         const total = await this.userRepository.count({

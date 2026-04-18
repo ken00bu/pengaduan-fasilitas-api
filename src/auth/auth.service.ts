@@ -76,7 +76,12 @@ export class AuthService {
             email: user.email
         })
         return {
-            message: 'Login using link successfully '
+            message: 'Login using link successfully',
+            user: {
+                username: user.username,
+                email: user.email,
+                role: user.role
+            }
         }
     }
 
@@ -116,11 +121,16 @@ export class AuthService {
 
     validateUser(request): boolean{
         const cookies = request.cookies;
-        const token = cookies?.access_token;
+        const query = request.query?.token || null
+        const token = cookies?.access_token || query;
         if(!token) return false;
 
-        const user = this.jwtService.verify(token)
-        console.log(user)
+        let user
+        try {
+            user = this.jwtService.verify(token)
+        } catch (error) {
+            return false
+        }
         if (!user) return false;
 
         request.user = {
@@ -131,7 +141,7 @@ export class AuthService {
         return true
     }
 
-    async login(response, loginDto: LoginDto): Promise<Record<string, string>>{
+    async login(response, loginDto: LoginDto): Promise<Record<string, any>>{
         const email = loginDto.email
         const user = await this.usersService.findUserByEmail(email)
         if (!user) throw new HttpException('Invalid credentials', HttpStatus.NOT_FOUND)
@@ -148,10 +158,15 @@ export class AuthService {
         }
 
         const token = this.jwtService.sign(payload)
-        response.cookie('access_token', token, { httpOnly: true })
+        response.cookie('access_token', token )
 
         return {
-            message: 'Login successfully'
+            message: 'Login successfully',
+            user: {
+                username: user.username,
+                email: user.email,
+                role: user.role
+            }
         }
     }
 

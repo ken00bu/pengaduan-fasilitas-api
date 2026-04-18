@@ -24,6 +24,18 @@ import { SlaStatus } from './entity/enum/sla-status.enum';
 import { FindReportDto } from './dto/find-report.dto';
 import { PriorityService } from 'src/priority/priority.service';
 import { formatTicketId } from 'src/shared/utils/stringFormat';
+import { Subject, Observable } from 'rxjs';
+import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
+
+type SSEReportEvent = {
+  type: 'new_report' | 'status_change' | 'report_updated' | 'reassigned' | 'assigned';
+  title?: string;
+  ticket?: string;
+  from?: string;
+  to?: string;
+  timestamp: string;
+  fromId?: number;
+};
 
 @Injectable()
 export class ReportsService {
@@ -37,6 +49,20 @@ export class ReportsService {
         @Inject('R2_CLIENT') private r2: S3Client,
         private priorityService: PriorityService
     ){}
+
+    private reportSSE$ = new Subject<MessageEvent>();
+
+    getReportsStream(): Observable<MessageEvent> {
+        return this.reportSSE$.asObservable();
+    }
+
+    private emitSSEEvent(event: SSEReportEvent) {
+    this.reportSSE$.next({
+        data: JSON.stringify(event),
+    } as MessageEvent);
+    }
+
+
 
     async createReport(createReportDto: CreateReportDto, file: Express.Multer.File, currentUser: any){
 
@@ -89,6 +115,15 @@ export class ReportsService {
         //generate ticket
         const ticket = formatTicketId(savedReport.id, savedReport.createdAt)
         const reportwithupdate = await this.reportRepository.update(savedReport.id, { ticket })
+
+        //event ke admin
+        this.emitSSEEvent({
+            type: 'new_report',
+            title: report.title,
+            ticket: reportwithupdate.affected ? ticket : undefined,
+            timestamp: new Date().toISOString(),
+            fromId: currentUser.id
+        });
 
         return {
             message: 'Report successfully added',
@@ -202,7 +237,9 @@ export class ReportsService {
             report.priority = priority
         }
 
+        
         const updatedReport = await this.reportRepository.save(report)
+
         return {
             message: "Report updated",
             report: updatedReport
@@ -215,12 +252,14 @@ export class ReportsService {
         //cek laporan dan kepemilikannya
         const report = await this.findReport(dto.id)
         if (!report) throw new BadRequestException('Report not found')
+        const oldStatus = report.status
+        const oldTechnician = report.assignedTechnician?.id
         const isOwner = user.id === report.user.id
         const isPrivileged = [UserRoles.ADMIN, UserRoles.TECHNICIAN].includes(user.role)
         if(!isOwner && !isPrivileged) throw new ForbiddenException('Report is not yours')
 
         //filter dto
-        const {filteredDto, errors} = getFilteredDto(dto, user.role)
+        const {filteredDto, errors} = getFilteredDto(dto, user.role, report.status)
         if(errors.length > 0) throw new BadRequestException(`Can't update certain field: ${errors}`) 
 
         //upload file ke r2
@@ -285,9 +324,56 @@ export class ReportsService {
         if (filteredDto.location) {
             Object.assign(report.location, { building, ...filteredDto.location })
         }
-
+        
         Object.assign(report, updatedReport)
         const newReport = await this.reportRepository.save(report)
+
+
+        //jika technician di assign pertama kali, kirim event dengan type assigned
+        if(!oldTechnician && newReport.assignedTechnician){
+            this.emitSSEEvent({
+                type: 'assigned',
+                title: newReport.title,
+                ticket: newReport.ticket,
+                from: oldTechnician ? `Technician ID ${oldTechnician}` : 'Unassigned',
+                to: newReport.assignedTechnician ? `Technician ID ${newReport.assignedTechnician.id}` : 'Unassigned',
+                timestamp: new Date().toISOString(),
+                fromId: user.role === UserRoles.ADMIN ? user.id : undefined
+            });
+        }else if(oldTechnician !== newReport.assignedTechnician?.id){
+            //jika technician di assign ulang, kirim event dengan type reassigned
+            this.emitSSEEvent({
+                type: 'reassigned',
+                title: newReport.title,
+                ticket: newReport.ticket,
+                from: oldTechnician ? `Technician ID ${oldTechnician}` : 'Unassigned',
+                to: newReport.assignedTechnician ? `Technician ID ${newReport.assignedTechnician.id}` : 'Unassigned',
+                timestamp: new Date().toISOString(),
+                fromId: user.role === UserRoles.ADMIN ? user.id : undefined
+            });
+        } else {
+            //jika selain itu, kirim event dengan type report_updated
+            this.emitSSEEvent({
+                type: 'report_updated',
+                title: newReport.title,
+                ticket: newReport.ticket,
+                timestamp: new Date().toISOString(),
+                fromId: user.role === UserRoles.ADMIN ? user.id : undefined
+            });
+        }
+
+        if(oldStatus !== newReport.status){
+            //jika status berubah, kirim event dengan type status_change
+            this.emitSSEEvent({
+                type: 'status_change',
+                title: newReport.title,
+                ticket: newReport.ticket,
+                from: oldStatus,
+                to: newReport.status,
+                timestamp: new Date().toISOString(),
+            });
+        }
+
         return {
             message: "Report updated",
             report: newReport
@@ -342,6 +428,7 @@ export class ReportsService {
             'building.name',
             'faculty.name',
             'faculty.code',
+            'priority.weight',
             'priority.name'
         ];
 
@@ -352,7 +439,6 @@ export class ReportsService {
                 'reports.technicianNote',
                 'user.id',
                 'user.email',
-                'priority.weight',
                 'technician.id',
             );
         }
@@ -365,8 +451,12 @@ export class ReportsService {
 
         query.select(filteredSelect);
 
-        if (user.role !== UserRoles.ADMIN) {
+        if (user.role === UserRoles.USER) {
             query.andWhere('user.id = :userId', { userId: user.id });
+        }
+
+        if (user.role === UserRoles.TECHNICIAN){
+            query.andWhere('technician.id = :technicianId', { technicianId: user.id })
         }
 
         if (dto?.id) {
@@ -391,7 +481,7 @@ export class ReportsService {
 
         if (dto?.status) {
             if (
-                user.role !== UserRoles.ADMIN &&
+                user.role === UserRoles.USER &&
                 dto.status === ReportStatus.REJECTED_BY_TECHNICIAN
             ) {
                 throw new BadRequestException('Invalid status');
@@ -440,56 +530,84 @@ export class ReportsService {
     async findStatistic(currentUser: User){
         const user = await this.usersService.findUserByEmail(currentUser.email)
         if(!user) throw new BadRequestException('User not exist')
+        const isTechnician = user.role === UserRoles.TECHNICIAN ? true : false
         const isAdmin = currentUser.role === UserRoles.ADMIN ? true : false
-        
-        const pendingCount = await this.reportRepository.count({
-            where: {
-                ...isAdmin ? undefined : { user: {id: user.id} },
-                status: ReportStatus.PENDING
-            }
-        })
+        const isUser = user.role === UserRoles.USER ? true : false
 
-        const progressCount = await this.reportRepository.count({
-            where: {
-                ...isAdmin ? undefined : { user: {id: user.id} },
-                status: ReportStatus.PROGRESS
-            }
-        })
-
-        const doneCount = await this.reportRepository.count({
-            where: {
-                ...isAdmin ? undefined : { user: {id: user.id} },
-                status: ReportStatus.DONE
-            }
-        })
-
-        const rejectedCount = await this.reportRepository.count({
-            where: {
-                ...isAdmin ? undefined : { user: {id: user.id} },
-                status: ReportStatus.REJECTED
-            },
-        })
-
-        let rejectedByTechnicianCount
-        if(isAdmin){
-            rejectedByTechnicianCount = await this.reportRepository.count({
+        if(isUser || isAdmin){
+            const pendingCount = await this.reportRepository.count({
                 where: {
-                    status: ReportStatus.REJECTED_BY_TECHNICIAN
+                    ...isAdmin ? undefined : { user: {id: user.id} },
+                    status: ReportStatus.PENDING
                 }
             })
-        }
-
-
-        return {
-            total: pendingCount + progressCount + doneCount + rejectedCount,
-            count: {
-                pending: pendingCount,
-                progress: progressCount,
-                done: doneCount,
-                rejected: rejectedCount,
-                ...(isAdmin && { rejectedByTechnician: rejectedByTechnicianCount })
+    
+            const progressCount = await this.reportRepository.count({
+                where: {
+                    ...isAdmin ? undefined : { user: {id: user.id} },
+                    status: ReportStatus.PROGRESS
+                }
+            })
+    
+            const doneCount = await this.reportRepository.count({
+                where: {
+                    ...isAdmin ? undefined : { user: {id: user.id} },
+                    status: ReportStatus.DONE
+                }
+            })
+    
+            const rejectedCount = await this.reportRepository.count({
+                where: {
+                    ...isAdmin ? undefined : { user: {id: user.id} },
+                    status: ReportStatus.REJECTED
+                },
+            })
+    
+            let rejectedByTechnicianCount
+            if(isAdmin){
+                rejectedByTechnicianCount = await this.reportRepository.count({
+                    where: {
+                        status: ReportStatus.REJECTED_BY_TECHNICIAN
+                    }
+                })
+            }
+    
+    
+            return {
+                total: pendingCount + progressCount + doneCount + rejectedCount,
+                count: {
+                    pending: pendingCount,
+                    progress: progressCount,
+                    done: doneCount,
+                    rejected: rejectedCount,
+                    ...(isAdmin && { rejectedByTechnician: rejectedByTechnicianCount })
+                }
             }
         }
+
+        if(isTechnician){
+            const assignedToMeCount = await this.reportRepository.count({
+                where: {
+                    assignedTechnician: {
+                        id: user.id
+                    }
+                }
+            })
+            const finishedByMeCount = await this.reportRepository.count({
+                where: {
+                    assignedTechnician: {
+                        id: user.id
+                    },
+                    status: ReportStatus.DONE
+                }
+            })
+
+            return {
+                totalAssigned: assignedToMeCount,
+                finished: finishedByMeCount,
+            }
+        }
+        
 
     }
 

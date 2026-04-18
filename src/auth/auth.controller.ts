@@ -31,7 +31,7 @@ export class AuthController {
     @HttpCode(HttpStatus.ACCEPTED)
     async login( 
         @Res({passthrough: true}) response: Response,
-        @Body() loginDto: LoginDto): Promise<Record<string, string>>{
+        @Body() loginDto: LoginDto): Promise<Record<string, any>>{
         return await this.authService.login(response, loginDto)
     }
 

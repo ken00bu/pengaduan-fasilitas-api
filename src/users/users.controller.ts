@@ -44,4 +44,7 @@ export class UsersController {
     ){
         return await this.usersService.createTechnician(dto) 
     }
+
+    
+
 }
