@@ -1,5 +1,5 @@
 import { IsNumber, IsString, IsNotEmpty, IsOptional, IsEnum, IsDate, ValidateIf } from "class-validator";
-import { Type } from "class-transformer";
+import { Type, Transform } from "class-transformer";
 import { ReportStatus } from "../entity/enum/report-status.enum";
 import { SlaStatus } from "../entity/enum/sla-status.enum";
 
@@ -64,8 +64,8 @@ export class UpdateReportDto {
 
     @IsOptional()
     @ValidateIf((_, value) => value !== 'unassign')
-    @Type(() => Number) 
-    @IsNumber()
+    @Transform(({ value }) => value === 'unassign' ? value : Number(value))
+    @IsNumber({}, { message: 'harus number atau string "unassign"' })
     assignedTechnicianId: number | null;
 
     @IsOptional()
