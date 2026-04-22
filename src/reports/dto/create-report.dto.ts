@@ -22,12 +22,12 @@ export class CreateReportDto {
     detail: string
 
     @IsString()
-    @MinLength(20)
+    @MinLength(10)
     @MaxLength(40)
     title: string
 
     @IsString()
-    @MinLength(20)
+    @MinLength(10)
     @MaxLength(1000)
     description: string
 

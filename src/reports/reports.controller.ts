@@ -8,7 +8,6 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UpdateReportDto } from './dto/update-report.dto';
-import { UpdateReportV2Dto } from './dto/update-report-v2.dto';
 import { ParseJsonPipe } from './pipes/parse-json-pipe.pipe';
 import { FindReportDto } from './dto/find-report.dto';
 import { Observable } from 'rxjs';
@@ -52,10 +51,10 @@ export class ReportsController {
     @UseInterceptors(FileInterceptor('file'))
     async updateReportV2(
         @UploadedFile() file: Express.Multer.File,
-        @Body() updateReportV2: UpdateReportV2Dto,
-        @CurrentUser() CurrentUser: User
+        @Body() updateReportV2: UpdateReportDto,
+        @CurrentUser() currentUser: User
     ){
-        return await this.reportsService.updateReportV2(file, updateReportV2, CurrentUser)
+        return await this.reportsService.updateReport(file, updateReportV2, currentUser)
     }
 
     // Find report

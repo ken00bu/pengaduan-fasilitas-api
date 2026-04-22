@@ -5,17 +5,14 @@ import { Repository } from 'typeorm';
 import { Report } from './entity/report.entity';
 import { CategoriesService } from 'src/categories/categories.service';
 import { Category } from 'src/categories/entity/category.entity';
-import { S3Client, PutObjectAclCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
 import { Building } from 'src/locations/entity/building.entity';
-import { Location } from 'src/locations/entity/location.entity';
 import { BuildingsService } from 'src/locations/buildings/buildings.service';
 import { getFilteredDto } from './helpers/getFilteredDto';
 import { LocationsService } from 'src/locations/locations.service';
-import { CreateLocationDto } from 'src/locations/dto/create-location.dto';
 import { ForbiddenException } from '@nestjs/common';
 import { UpdateReportDto } from './dto/update-report.dto';
-import { UpdateReportV2Dto } from './dto/update-report-v2.dto';
 import { UserRoles } from 'src/users/entity/user.entity';
 import { User } from 'src/users/type/user.type';
 import { UsersService } from 'src/users/users.service';
@@ -25,7 +22,6 @@ import { FindReportDto } from './dto/find-report.dto';
 import { PriorityService } from 'src/priority/priority.service';
 import { formatTicketId } from 'src/shared/utils/stringFormat';
 import { Subject, Observable } from 'rxjs';
-import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
 
 type SSEReportEvent = {
   type: 'new_report' | 'status_change' | 'report_updated' | 'reassigned' | 'assigned';
@@ -131,128 +127,13 @@ export class ReportsService {
         }
     }
 
-    async updateReport(dto: UpdateReportDto, user: User, file: Express.Multer.File){
-
-        console.log('report update masuk')
-        //cek apakah report exist
-        const report = await this.findReport(dto.reportId)
-        if (!report) throw new BadRequestException("Report not found")
-
-        //cek apakah report id milik user jika dia bukan admin atau technician
-        if(user.id != report.user.id && user.role === UserRoles.USER) throw new BadRequestException('Report is not yours')
-
-        //cek file dan role
-        if(file && user.role !== UserRoles.USER){
-            throw new BadRequestException("You can't change user image")
-        }
-
-        if(file){
-            const format = file.mimetype === "image/jpeg" ? '.jpeg' : '.png'
-            console.log('file di upload dengan format: ', format)
-            const key = "reports/" + randomUUID() + format
-            try {
-                await this.r2.send(new PutObjectCommand({
-                    Bucket: "lapor-sarpras-bucket",
-                    Key: key,
-                    Body: file.buffer,
-                     ContentType: file.mimetype
-                }))
-                report.imgUrl = key
-            } catch (error) {
-                console.log(error)
-                throw new BadRequestException('failed uploading your file')
-            }
-            
-        }
-
-        //filter dto berdasarkan role
-        const adminFields = ['categoryId', 'location', 'description', 'status', 'assignedTechnicianId', 'adminNote', 'priority']
-        const userFields = ['categoryId', 'location', 'description']
-        const technicianFields = ['status', 'technicianNote']
-        const technicianAllowedStatus = [ReportStatus.REJECTED, ReportStatus.DONE]
-        const allowedFields = user.role === UserRoles.ADMIN ? adminFields : user.role === UserRoles.TECHNICIAN ? technicianFields : userFields
-
-        const filteredDto = Object.fromEntries(Object.entries(dto).filter(([key])=>{
-            return allowedFields.includes(key)
-        }))
-
-         //jika ada category apakaha ada? kalau ada ganti relasinya
-        if(filteredDto.categoryId){
-            const category = await this.categoriesService.findCategoryById(dto.categoryId)
-            if(!category) throw new BadRequestException('Category not found')
-
-            report.category = category
-        }
-
-        //cek apakah assigned technician di set, kalau ada cek lagi apakah ada kalau ada ganti :) (belum di test)
-        if(filteredDto.assignedTechnicianId){
-            const technician = await this.usersService.findOneTechnicianById(filteredDto.assignedTechnicianId)
-            if(!technician) throw new BadRequestException('Technician not found')
-            report.assignedTechnician = technician
-        }
-
-        //handle update location
-        if (filteredDto.location){
-            Object.assign(report.location, dto.location);
-        }
-
-        //handle stutus
-        if(filteredDto.status){
-
-            if(user.role === 'technician' && !technicianAllowedStatus.includes(filteredDto.status)){
-              throw new BadRequestException('Technicians are only allowed to set the report status to Done or Rejected')  
-            } 
-
-            let finalStatus = filteredDto.status
-            if(filteredDto.status === ReportStatus.REJECTED && user.role === UserRoles.TECHNICIAN ){
-                finalStatus = ReportStatus.REJECTED_BY_TECHNICIAN
-            } 
-            if(filteredDto.status === ReportStatus.DONE){
-                finalStatus = ReportStatus.DONE
-                if(report.slaDate < new Date()) report.slaStatus = SlaStatus.LATE
-            } 
-
-            report.status = finalStatus
-
-        }
-
-        //handle description
-        if(filteredDto.description){
-            report.description = filteredDto.description
-        }
-
-        //handle note admin
-        if(filteredDto.adminNote){
-            report.adminNote = filteredDto.adminNote
-        }
-
-        //handle note technician
-        if(filteredDto.technicianNote){
-            report.technicianNote = filteredDto.technicianNote
-        }
-
-        if(filteredDto.priority){
-            const priority = await this.priorityService.findPriorityById(filteredDto.priority)
-            if(!priority) throw new BadRequestException('Invalid priority')
-            report.priority = priority
-        }
-
-        
-        const updatedReport = await this.reportRepository.save(report)
-
-        return {
-            message: "Report updated",
-            report: updatedReport
-        }
-
-    }
-
-    async updateReportV2(file: Express.Multer.File, dto: UpdateReportV2Dto, user: User){
+    async updateReport(file: Express.Multer.File, dto: UpdateReportDto, user: User){
 
         //cek laporan dan kepemilikannya
         const report = await this.findReport(dto.id)
         if (!report) throw new BadRequestException('Report not found')
         const oldStatus = report.status
+        const oldSlaStatus = report.slaStatus
         const oldTechnician = report.assignedTechnician?.id
         const isOwner = user.id === report.user.id
         const isPrivileged = [UserRoles.ADMIN, UserRoles.TECHNICIAN].includes(user.role)
@@ -266,7 +147,6 @@ export class ReportsService {
         if(file){
             if(user.role !== UserRoles.USER) throw new BadRequestException(`You aren't allowed to change user image`)
             const format = file.mimetype === "image/jpeg" ? '.jpeg' : '.png'
-            console.log('file di upload dengan format: ', format)
             const key = "reports/" + randomUUID() + format
             try {
                 await this.r2.send(new PutObjectCommand({
@@ -300,16 +180,27 @@ export class ReportsService {
             if (!building) throw new NotFoundException('Building not found')
         }
 
-        if (filteredDto.assignedTechnicianId) {
-            assignedTechnician = await this.usersService.findOneTechnicianById(Number(filteredDto.assignedTechnicianId))
-            if (!assignedTechnician) throw new NotFoundException('Technician not found')
-            report.assignedTechnician = assignedTechnician
+        if (filteredDto.assignedTechnicianId !== undefined) {
+            // field dikirim di request
+            console.log(`Mencari technician dengan ID ${filteredDto.assignedTechnicianId}`)
+            if (filteredDto.assignedTechnicianId !== null) {
+                console.log(`Mencari technician dengan ID ${filteredDto.assignedTechnicianId}`)
+                const assignedTechnician = await this.usersService.findOneTechnicianById(Number(filteredDto.assignedTechnicianId));
+                if (!assignedTechnician) throw new NotFoundException('Technician not found');
+                report.assignedTechnician = assignedTechnician;
+            } else {
+                report.assignedTechnician = null;
+            }
         }
 
         if (filteredDto.priority) {
             priority = await this.priorityService.findPriorityById(Number(filteredDto.priority))
             if (!priority) throw new NotFoundException('Priority not found')
             report.priority = priority
+        }
+
+        if(filteredDto.status === ReportStatus.DONE && report.slaDate < new Date()){
+            report.slaStatus = SlaStatus.LATE
         }
         
         //apply perubahan ke report
@@ -338,7 +229,7 @@ export class ReportsService {
                 from: oldTechnician ? `Technician ID ${oldTechnician}` : 'Unassigned',
                 to: newReport.assignedTechnician ? `Technician ID ${newReport.assignedTechnician.id}` : 'Unassigned',
                 timestamp: new Date().toISOString(),
-                fromId: user.role === UserRoles.ADMIN ? user.id : undefined
+                fromId: user.id
             });
         }else if(oldTechnician !== newReport.assignedTechnician?.id){
             //jika technician di assign ulang, kirim event dengan type reassigned
@@ -349,7 +240,7 @@ export class ReportsService {
                 from: oldTechnician ? `Technician ID ${oldTechnician}` : 'Unassigned',
                 to: newReport.assignedTechnician ? `Technician ID ${newReport.assignedTechnician.id}` : 'Unassigned',
                 timestamp: new Date().toISOString(),
-                fromId: user.role === UserRoles.ADMIN ? user.id : undefined
+                fromId: user.id
             });
         } else {
             //jika selain itu, kirim event dengan type report_updated
@@ -358,7 +249,7 @@ export class ReportsService {
                 title: newReport.title,
                 ticket: newReport.ticket,
                 timestamp: new Date().toISOString(),
-                fromId: user.role === UserRoles.ADMIN ? user.id : undefined
+                fromId: user.id
             });
         }
 
@@ -371,6 +262,20 @@ export class ReportsService {
                 from: oldStatus,
                 to: newReport.status,
                 timestamp: new Date().toISOString(),
+                fromId: user.id
+            });
+        }
+
+        // SLA status change event (pengajuan SLA oleh teknisi)
+        if (oldSlaStatus !== newReport.slaStatus) {
+            this.emitSSEEvent({
+                type: 'status_change',
+                title: newReport.title,
+                ticket: newReport.ticket,
+                from: oldSlaStatus,
+                to: newReport.slaStatus,
+                timestamp: new Date().toISOString(),
+                fromId: user.id
             });
         }
 

@@ -21,7 +21,7 @@ export class Report{
     user: User //relasi USER DONE
 
     @ManyToOne(()=> User, (user)=> user.assigned_reports, {nullable: true})
-    assignedTechnician: User //relasi USER YANG TECHNITIAN DONE
+    assignedTechnician: User | null //relasi USER YANG TECHNITIAN DONE
     
     @ManyToOne(()=> Category, (category)=> category.report)
     category: Category; //relasi CATEGORY DONE

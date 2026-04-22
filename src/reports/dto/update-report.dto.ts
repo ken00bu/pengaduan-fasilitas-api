@@ -1,40 +1,44 @@
-import { IsNumber, IsString, Min, Max, ValidateNested, IsNotEmpty, IsNumberString, IsObject, IsOptional, IsEnum } from "class-validator";
-import { Transform } from "class-transformer";
+import { IsNumber, IsString, IsNotEmpty, IsOptional, IsEnum, IsDate, ValidateIf } from "class-validator";
+import { Type } from "class-transformer";
 import { ReportStatus } from "../entity/enum/report-status.enum";
-
-class Location {
-
-    @IsNumberString()
-    buildingId: number
-
-    @IsString()
-    room: string
-
-    @IsString()
-    detail: string
-
-    @IsNumberString()
-    floor: string
-
-}
+import { SlaStatus } from "../entity/enum/sla-status.enum";
 
 export class UpdateReportDto {
 
-    @IsNumber({}, {message: 'Report ID is required.'})
-    reportId: number
+    @Type(() => Number)
+    @IsNumber()
+    @IsNotEmpty()
+    id: number
 
+    @IsOptional()
+    file: any
+
+    @Type(() => Number)
     @IsNumber()
     @IsOptional()
+    @IsNotEmpty()
     categoryId: number
 
-    @ValidateNested()
-    location: Location
+    //location
+    @Type(() => Number)
+    @IsNumber()
+    @IsOptional()
+    @IsNotEmpty()
+    buildingId: number
 
     @IsString()
     @IsOptional()
-    @Transform(({ value }) => ("" + value).toLowerCase())
-    @IsEnum(ReportStatus)
-    status: string
+    room: string
+
+    @Type(() => Number)
+    @IsNumber()
+    @IsOptional()
+    @IsNotEmpty()
+    floor: number
+
+    @IsString()
+    @IsOptional()
+    detail: string
 
     @IsString()
     @IsOptional()
@@ -44,20 +48,35 @@ export class UpdateReportDto {
     @IsOptional()
     description: string
 
-    @IsString()
+
+    @IsEnum(ReportStatus)
+    @IsOptional()
+    status: ReportStatus
+
+    @IsOptional()
+    @IsEnum(SlaStatus)
+    slaStatus: SlaStatus;
+
+    @Type(()=> Date)
+    @IsDate()
+    @IsOptional()
+    slaDate: Date
+
+    @IsOptional()
+    @ValidateIf((_, value) => value !== null)
+    @IsNumber()
+    assignedTechnicianId: number | null;
+
     @IsOptional()
     adminNote: string
 
-    @IsString()
+    @IsOptional()
+    priority: string
+
+    @IsOptional()
+    reopenedAt: Date
+
     @IsOptional()
     technicianNote: string
-
-    @IsNumber()
-    @IsOptional()
-    priority: number
-
-    @IsNumber()
-    @IsOptional()
-    assignedTechnicianId: number
 
 }

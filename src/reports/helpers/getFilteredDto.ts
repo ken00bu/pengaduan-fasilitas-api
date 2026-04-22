@@ -1,5 +1,5 @@
 import { ReportStatus } from "../entity/enum/report-status.enum"
-import { UpdateReportV2Dto } from "../dto/update-report-v2.dto"
+import { UpdateReportDto } from "../dto/update-report.dto"
 import { UserRoles } from "src/users/entity/user.entity"
 
 const FIELD_PERMISSIONS = {
@@ -51,7 +51,7 @@ export type FilteredReportDto = {
     }
 }
 
-export const getFilteredDto = (dto: UpdateReportV2Dto, role: UserRoles, currentStatus?: ReportStatus) => {
+export const getFilteredDto = (dto: UpdateReportDto, role: UserRoles, currentStatus?: ReportStatus) => {
 
     const errors: any = []
     const filteredDto: FilteredReportDto = {}
