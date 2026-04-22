@@ -63,7 +63,8 @@ export class UpdateReportDto {
     slaDate: Date
 
     @IsOptional()
-    @ValidateIf((_, value) => value !== null)
+    @ValidateIf((_, value) => value !== 'unassign')
+    @Type(() => Number) 
     @IsNumber()
     assignedTechnicianId: number | null;
 

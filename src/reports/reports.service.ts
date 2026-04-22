@@ -22,6 +22,7 @@ import { FindReportDto } from './dto/find-report.dto';
 import { PriorityService } from 'src/priority/priority.service';
 import { formatTicketId } from 'src/shared/utils/stringFormat';
 import { Subject, Observable } from 'rxjs';
+import e from 'express';
 
 type SSEReportEvent = {
   type: 'new_report' | 'status_change' | 'report_updated' | 'reassigned' | 'assigned';
@@ -181,14 +182,15 @@ export class ReportsService {
         }
 
         if (filteredDto.assignedTechnicianId !== undefined) {
+            console.log('mencoba assign technician dengan id: ', filteredDto.assignedTechnicianId)
             // field dikirim di request
-            console.log(`Mencari technician dengan ID ${filteredDto.assignedTechnicianId}`)
-            if (filteredDto.assignedTechnicianId !== null) {
-                console.log(`Mencari technician dengan ID ${filteredDto.assignedTechnicianId}`)
+            if (filteredDto.assignedTechnicianId !== 'unassign') {
+                console.log('assign technician')
                 const assignedTechnician = await this.usersService.findOneTechnicianById(Number(filteredDto.assignedTechnicianId));
                 if (!assignedTechnician) throw new NotFoundException('Technician not found');
                 report.assignedTechnician = assignedTechnician;
             } else {
+                console.log('unassign technician')
                 report.assignedTechnician = null;
             }
         }

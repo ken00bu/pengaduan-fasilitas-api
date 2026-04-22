@@ -23,7 +23,7 @@ const FIELD_PERMISSIONS = {
 const TECHNICIAN_ALLOWED_STATUS = [ReportStatus.REJECTED_BY_TECHNICIAN, ReportStatus.DONE]
 const STATUS_RULE = {
     [ReportStatus.REJECTED_BY_TECHNICIAN]: [ReportStatus.PROGRESS],
-    [ReportStatus.DONE]: [ReportStatus.PROGRESS]
+    [ReportStatus.DONE]: [ReportStatus.PROGRESS],
 }
 const LOCATION = ['buildingId', 'room', 'floor', 'detail']
 
