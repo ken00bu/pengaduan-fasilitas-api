@@ -1,8 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateBuildingDto } from '../dto/create-building.dto';
 import { Building } from '../entity/building.entity';
+import { Location } from '../entity/location.entity';
 import { Faculty } from '../entity/faculty.entity';
 import { FacultiesService } from '../faculties/faculties.service';
 import { BuildingsFilterDto } from '../dto/buildings-filter.dto';
@@ -13,7 +14,11 @@ export class BuildingsService {
     constructor(
         @InjectRepository(Building)
         private buildingRepository: Repository<Building>,
-        private facultiesService: FacultiesService
+        private facultiesService: FacultiesService,
+        @InjectRepository(Building)
+        private buildingRepo: Repository<Building>,
+        @InjectRepository(Location)
+        private locationRepo: Repository<Location>
     ){}
 
     async createBuilding(createBuildingDto: CreateBuildingDto){
@@ -70,6 +75,28 @@ export class BuildingsService {
 
     async findOneById(id: number): Promise<Building | null>{
         return await this.buildingRepository.findOneBy({id})
+    }
+
+    async deleteBuilding(id: number){
+        const building = await this.buildingRepo.findOne({
+            where: { id },
+            relations: { location: { report: true } },
+        });
+
+        if (!building) throw new NotFoundException('Building tidak ditemukan');
+        // if (building.isSystem) throw new BadRequestException('Building bawaan sistem tidak bisa dihapus');
+
+        const stillUsed = building.location.some((loc) => loc.report);
+
+        if (stillUsed) {
+
+            await this.buildingRepo.softRemove(building);
+            return { message: 'Building diarsipkan' };
+        }
+
+        await this.locationRepo.delete({ building: { id } });
+        await this.buildingRepo.delete(id);
+        return { message: 'Building dihapus permanen' };
     }
 
 }

@@ -1,4 +1,4 @@
-    import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Repository, OneToMany, ManyToOne } from "typeorm";
+    import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Repository, OneToMany, ManyToOne, DeleteDateColumn } from "typeorm";
     import { Location } from "./location.entity";
     import { Faculty } from "./faculty.entity";
 
@@ -32,5 +32,8 @@
 
         @CreateDateColumn()
         created_at: Date;
+
+        @DeleteDateColumn()
+        delete_at: Date
 
     }

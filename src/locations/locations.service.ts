@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Location } from './entity/location.entity';
+import { Faculty } from './entity/faculty.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -9,7 +10,9 @@ export class LocationsService {
 
     constructor(
         @InjectRepository(Location)
-        private locationRepository: Repository<Location>
+        private locationRepository: Repository<Location>,
+        @InjectRepository(Faculty)
+        private facultyRepository: Repository<Faculty>
     ){}
 
     async createLocation(createLocationDto: CreateLocationDto){
@@ -30,6 +33,17 @@ export class LocationsService {
             message: "success cuy",
             location: savedLocation
         }
+    }
+
+    async getAllLocations() {
+        return await this.facultyRepository
+            .createQueryBuilder('faculty')
+            .leftJoinAndSelect('faculty.building', 'building')
+            .orderBy('CASE WHEN faculty.id = :pinnedId THEN 0 ELSE 1 END', 'ASC')
+            .addOrderBy('faculty.name', 'ASC')
+            .addOrderBy('building.name', 'ASC')
+            .setParameter('pinnedId', 1)
+            .getMany();
     }
 
 }

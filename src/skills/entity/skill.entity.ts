@@ -19,9 +19,6 @@ export class Skill {
     })
     isSystem: boolean;
 
-    @OneToMany(()=>Category, (categories)=>categories.skill)
-    category: Category[]
-
     @OneToMany(()=>User, (user)=>user.skill)
     user: User
     

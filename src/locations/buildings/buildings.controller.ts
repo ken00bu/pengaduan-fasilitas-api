@@ -1,4 +1,5 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Delete, Param } from '@nestjs/common';
+import { ParseIntPipe } from '@nestjs/common/pipes/parse-int.pipe';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
@@ -28,4 +29,14 @@ export class BuildingsController {
     ){
         return await this.buildingService.findMany(BuildingsFilterDto)
     }
+
+    @Delete(':id')
+    @Roles([UserRoles.ADMIN])
+    @UseGuards(AuthGuard, RolesGuard)
+    async deleteBuilding(
+        @Param('id', ParseIntPipe) id: number,
+    ) {
+    return this.buildingService.deleteBuilding(id);
+    }
+
 }

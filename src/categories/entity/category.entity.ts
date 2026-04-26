@@ -20,9 +20,6 @@ export class Category {
 
     @ManyToOne(()=>Priority, (priority)=>priority.category)
     priority: Priority
-
-    @ManyToOne(()=>Skill, (skill)=>skill.category)
-    skill: Skill
     
     @OneToMany(()=> Report, (report)=> report.category)
     report: Report[];
