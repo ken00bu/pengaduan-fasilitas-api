@@ -15,6 +15,7 @@ export class AuthController {
     @Post('/register')
     @HttpCode(HttpStatus.CREATED)
     async register( @Body() registerDto: RegisterDto): Promise<Record<string, string>>{
+        console.log('register request masuk')
         return await this.authService.register(registerDto)
     }
 

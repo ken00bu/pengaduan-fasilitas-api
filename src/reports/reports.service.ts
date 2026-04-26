@@ -434,6 +434,53 @@ export class ReportsService {
         }
     }
 
+    async findGeneral(ticket: string){
+        console.log('type of ticket: ', typeof ticket)
+        const query = this.reportRepository.createQueryBuilder('reports')
+            .leftJoin('reports.category', 'category')
+            .leftJoin('reports.location', 'location')
+            .leftJoin('location.building', 'building')
+            .leftJoin('building.faculty', 'faculty')
+            .leftJoin('reports.user', 'user')
+            .leftJoin('reports.assignedTechnician', 'technician')
+            .leftJoin('reports.priority', 'priority')
+            .select([
+                'reports.id',
+                'reports.title',
+                'reports.ticket',
+                'user.username',
+                'reports.slaDate',
+                'reports.description',
+                'reports.status',
+                'reports.slaStatus',
+                'reports.reopenedAt',
+                'reports.imgUrl',
+                'reports.priority',
+                'reports.createdAt',
+                'technician.username',
+                'category.id',
+                'category.name',
+                'priority.weight',
+                'priority.name',
+                'location.floor',
+                'location.room',
+                'location.detail',
+                'building.name',
+                'faculty.name',
+                'faculty.code'
+            ]);
+        
+        if(ticket){
+            console.log('mencari dengan ticket: ', ticket)
+            query.andWhere('reports.ticket = :ticket', { ticket: ticket })
+        }
+        const report = await query.getOne();
+
+        if(!report) throw new NotFoundException('Report not found')
+
+        return report
+    }
+
     async findStatistic(currentUser: User){
         const user = await this.usersService.findUserByEmail(currentUser.email)
         if(!user) throw new BadRequestException('User not exist')

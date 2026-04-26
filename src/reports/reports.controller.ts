@@ -65,6 +65,14 @@ export class ReportsController {
         @CurrentUser() currentUser: User){
         return await this.reportsService.findMany(dto, currentUser)
     }
+    
+    // Find report
+    @Get('general')
+    async findReportGeneral(
+        @Query('ticket') ticket:string
+    ){
+        return await this.reportsService.findGeneral(ticket)
+    }
 
     // Get statistic
     @Get('statistics')

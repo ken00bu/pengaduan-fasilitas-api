@@ -45,6 +45,10 @@ export class UsersController {
         return await this.usersService.createTechnician(dto) 
     }
 
-    
+    @Get('me')
+    @UseGuards(AuthGuard)
+    async getProfile(@CurrentUser() currentUser: User) {
+        return await this.usersService.getMe(currentUser);
+    }
 
 }

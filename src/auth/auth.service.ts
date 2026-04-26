@@ -1,4 +1,4 @@
-import { forwardRef, HttpCode, Inject } from '@nestjs/common';
+import { forwardRef, HttpCode, Inject, Logger } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
@@ -20,7 +20,7 @@ export class AuthService {
 
     //method register user biasa
     async register(registerDto: RegisterDto){
-
+        console.log('register request masuk')
         const username = registerDto.username
         const email = registerDto.email
         const password = registerDto.password

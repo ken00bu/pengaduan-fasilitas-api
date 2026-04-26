@@ -3,22 +3,22 @@ import { UpdateReportDto } from "../dto/update-report.dto"
 import { UserRoles } from "src/users/entity/user.entity"
 
 const FIELD_PERMISSIONS = {
-            categoryId: [UserRoles.USER, UserRoles.ADMIN],
-            buildingId: [UserRoles.USER, UserRoles.ADMIN],
-            room: [UserRoles.USER, UserRoles.ADMIN],
-            floor: [UserRoles.USER, UserRoles.ADMIN],
-            detail: [UserRoles.USER, UserRoles.ADMIN],
-            title: [UserRoles.USER, UserRoles.ADMIN],
-            description: [UserRoles.USER, UserRoles.ADMIN],
-            status: [UserRoles.ADMIN, UserRoles.TECHNICIAN],
-            slaStatus: [UserRoles.ADMIN, UserRoles.TECHNICIAN],
-            assignedTechnicianId: [UserRoles.ADMIN],
-            slaDate: [UserRoles.ADMIN],
-            adminNote: [UserRoles.ADMIN],
-            reopenedAt: [UserRoles.ADMIN],
-            priority: [UserRoles.ADMIN],
-            technicianNote: [UserRoles.TECHNICIAN],
-        }
+    categoryId: [UserRoles.ADMIN],
+    buildingId: [UserRoles.ADMIN],
+    room: [UserRoles.ADMIN],
+    floor: [UserRoles.ADMIN],
+    detail: [UserRoles.ADMIN],
+    title: [UserRoles.USER, UserRoles.ADMIN],
+    description: [UserRoles.USER, UserRoles.ADMIN],
+    status: [UserRoles.ADMIN, UserRoles.TECHNICIAN],
+    slaStatus: [UserRoles.ADMIN, UserRoles.TECHNICIAN],
+    assignedTechnicianId: [UserRoles.ADMIN],
+    slaDate: [UserRoles.ADMIN],
+    adminNote: [UserRoles.ADMIN],
+    reopenedAt: [UserRoles.ADMIN],
+    priority: [UserRoles.ADMIN],
+    technicianNote: [UserRoles.TECHNICIAN],
+}
 
 const TECHNICIAN_ALLOWED_STATUS = [ReportStatus.REJECTED_BY_TECHNICIAN, ReportStatus.DONE]
 const STATUS_RULE = {

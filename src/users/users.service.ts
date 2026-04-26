@@ -249,5 +249,28 @@ export class UsersService {
         }
     }
 
+    async getMe(currentUser: CurrentUser){
+        return await this.userRepository.findOne({
+            where: {
+                id: currentUser.id
+            },
+            relations: {
+                skill: true
+            },
+            select: {
+                id: true,
+                role: true,
+                user_type: true,
+                email: true,
+                username: true,
+                phone_number: true,
+                skill: {
+                    id: true,
+                    name: true
+                }
+            }
+        })
+    }
+
 
 }
