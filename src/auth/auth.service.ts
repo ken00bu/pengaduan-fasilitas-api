@@ -1,5 +1,7 @@
 import { forwardRef, HttpCode, Inject, Logger } from '@nestjs/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { UsersService } from 'src/users/users.service';
@@ -83,6 +85,23 @@ export class AuthService {
                 role: user.role
             }
         }
+    }
+
+    async changePassword(userId: number, dto: ChangePasswordDto) {
+        const user = await this.usersService.findUserById(userId);
+        if (!user) throw new NotFoundException('User tidak ditemukan');
+
+        const matches = await bcrypt.compare(dto.oldPassword, user.hashed_password);
+        if (!matches) throw new BadRequestException('Password lama salah');
+
+        if (dto.oldPassword === dto.newPassword) {
+            throw new BadRequestException('Password baru tidak boleh sama dengan yang lama');
+        }
+
+        const newHashed = await bcrypt.hash(dto.newPassword, await bcrypt.genSalt());
+        await this.usersService.updatePassword(userId, newHashed);
+
+        return { message: 'Password berhasil diubah' };
     }
 
     async sendEmailVerificationLink(email: string, token?: string){

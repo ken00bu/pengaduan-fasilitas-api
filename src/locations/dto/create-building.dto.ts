@@ -1,3 +1,4 @@
+import { Type } from "class-transformer";
 import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 export class CreateBuildingDto {
 
@@ -7,6 +8,7 @@ export class CreateBuildingDto {
     @IsNumber()
     floors: number;
 
+    @Type(() => Number) 
     @IsNumber()
     @IsOptional()
     facultyId: number

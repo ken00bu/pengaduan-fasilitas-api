@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entity/category.entity';
 import { Repository } from 'typeorm';
@@ -17,13 +18,13 @@ export class CategoriesService {
 
     async createCategory(createCategoryDto: CreateCategoryDto){
 
-        const priority = await this.priorityService.findPriorityById(createCategoryDto.priority)
+        const priority = await this.priorityService.findPriorityById(createCategoryDto.priorityId)
         if (!priority) throw new BadRequestException("Priority doesn't exist")
         
         const category = new Category()
         category.name = createCategoryDto.name.toLocaleLowerCase()
         category.priority = {
-            id: createCategoryDto.priority
+            id: createCategoryDto.priorityId
         } as any
 
         try {
@@ -42,11 +43,24 @@ export class CategoriesService {
         
     }
 
-    async deleteCategory(id){
-        await this.categoryRepository.delete(id)
-        return {
-            message: "category sucessfully deleted"
+    async deleteCategory(id: number) {
+        const category = await this.categoryRepository.findOne({
+            where: { id },
+            relations: { report: true },
+        });
+
+        if (!category) throw new NotFoundException('Category tidak ditemukan');
+        if (category.isSystem) throw new BadRequestException('Category bawaan sistem tidak bisa dihapus');
+
+        const stillUsed = category.report && category.report.length > 0;
+
+        if (stillUsed) {
+            await this.categoryRepository.softRemove(category);
+            return { message: 'Category diarsipkan (masih dipakai oleh laporan)' };
         }
+
+        await this.categoryRepository.delete(id);
+        return { message: 'Category dihapus permanen' };
     }
 
     async updateCategory(updateDto: UpdateDto){

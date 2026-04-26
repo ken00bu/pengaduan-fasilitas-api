@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Repository, OneToMany, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Repository, OneToMany, ManyToOne, DeleteDateColumn } from "typeorm";
 import { Report } from "src/reports/entity/report.entity";
 import { Aspiration } from "src/aspirations/entity/aspiration.entity";
 import { Priority } from "src/priority/entity/priority.entity";
@@ -29,5 +29,8 @@ export class Category {
 
     @CreateDateColumn()
     createdAt: Date;
+
+    @DeleteDateColumn()
+    deleteAt: Date
     
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, HttpStatus, UseGuards, Body, Delete, Param, Put, Req, Patch, Get } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, UseGuards, Body, Delete, Param, Put, Req, Patch, Get, ParseIntPipe } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
@@ -27,7 +27,7 @@ export class CategoriesController {
     @HttpCode(HttpStatus.CREATED)
     @Roles([UserRoles.ADMIN])
     @UseGuards(AuthGuard, RolesGuard)
-    async deleteCategory(@Param('id') id: string){
+    async deleteCategory(@Param('id', ParseIntPipe) id: number){
         return this.categoriesService.deleteCategory(id)
     }
 

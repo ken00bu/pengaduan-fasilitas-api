@@ -42,6 +42,14 @@ export class UsersService {
         })
     }
 
+    async findUserById(id: number) {
+        return await this.userRepository.findOne({ where: { id } });
+    }
+
+    async updatePassword(id: number, hashedPassword: string) {
+        return await this.userRepository.update(id, { hashed_password: hashedPassword });
+    }
+
     async isEmailExistAndVerified(email:string): Promise<Boolean>{
         const user:User | null = await this.userRepository.findOneBy({
             email: email
